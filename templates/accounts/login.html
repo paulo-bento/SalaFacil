@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Entrar | SalaFácil!{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block main_class %}login-main{% endblock %}
+
+{% block content %}
+<section class="login-shell">
+    <div class="login-layout">
+        <section class="login-brand-panel">
+            <div class="brand-content">
+                <h1 class="brand-title">
+                    Sala<span>Fácil</span>!
+                </h1>
+
+                <p class="brand-description">
+                    Agende salas e auditórios de forma simples, fácil e eficiente.
+                </p>
+            </div>
+        </section>
+
+        <section class="login-form-panel">
+            <div class="form-content">
+                <header class="login-header">
+                    <h2>Entrar na sua conta</h2>
+                    <p>Informe suas credenciais para acessar o sistema.</p>
+                </header>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <label for="email">E-mail institucional</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="seu.email@instituicao.edu.br"
+                        autocomplete="username"
+                        required
+                    >
+
+                    <label for="password">Senha</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Digite sua senha"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button type="submit" class="login-submit-button">
+                        Entrar
+                    </button>
+                </form>
+
+                <div class="login-divider">
+                    <span>ou</span>
+                </div>
+
+                <div class="login-actions">
+                    <a href="#" class="secondary-action">
+                        Criar nova conta
+                    </a>
+
+                    <a href="#" class="forgot-password-link">
+                        Esqueci minha senha...
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+</section>
+{% endblock %}
