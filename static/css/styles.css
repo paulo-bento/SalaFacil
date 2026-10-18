@@ -1,0 +1,26 @@
+:root {
+    --salafacil-primary: #f4511e;
+    --salafacil-primary-hover: #d84315;
+    --salafacil-dark: #302f29;
+}
+
+:root:not([data-theme="dark"]),
+[data-theme="light"] {
+    --pico-primary: var(--salafacil-primary);
+    --pico-primary-background: var(--salafacil-primary);
+    --pico-primary-border: var(--salafacil-primary);
+    --pico-primary-hover: var(--salafacil-primary-hover);
+    --pico-primary-hover-background: var(--salafacil-primary-hover);
+    --pico-primary-hover-border: var(--salafacil-primary-hover);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --pico-primary: #ff7043;
+        --pico-primary-background: var(--salafacil-primary);
+        --pico-primary-border: var(--salafacil-primary);
+        --pico-primary-hover: #ff8a65;
+        --pico-primary-hover-background: var(--salafacil-primary-hover);
+        --pico-primary-hover-border: var(--salafacil-primary-hover);
+    }
+}
