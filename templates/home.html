@@ -6,4 +6,12 @@
     <h1>SalaFácil!</h1>
     <p>Sistema de gerenciamento e agendamento de salas..</p>
     <button type="button">Em desenvolvimento...</button>
+
+
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Sair da conta</button>
+        </form>
+    {% endif %}
 {% endblock %}

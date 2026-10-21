@@ -1,0 +1,183 @@
+/* Dashboard real: grade, reservas e ajustes de interface */
+
+.dashboard-main .calendar-scroll .calendar-head,
+.dashboard-main .calendar-scroll .timeline {
+    grid-template-columns:
+        53px repeat(var(--room-count), minmax(115px, 1fr));
+}
+
+.dashboard-main .slot-readonly {
+    cursor: default;
+}
+
+.dashboard-main .slot-readonly:hover {
+    background: transparent;
+}
+
+.dashboard-main .slot-readonly:hover::after {
+    content: none;
+}
+
+
+.dashboard-main .slot-readonly.slot-occupied,
+.dashboard-main .slot-readonly.slot-occupied:hover {
+    background: rgb(255 90 36 / 22%);
+    border-left: 3px solid #ff5a24;
+    cursor: default;
+}
+
+
+/* Formulário de reservas reais */
+
+.dashboard-main .reserva-card {
+    margin-bottom: 24px;
+    padding: 20px;
+}
+
+.dashboard-main .reserva-heading {
+    margin-bottom: 18px;
+}
+
+.dashboard-main .reserva-heading h2 {
+    font-size: 17px;
+    color: var(--ink);
+}
+
+.dashboard-main .reserva-heading p {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.dashboard-main .reserva-card .field input,
+.dashboard-main .reserva-card .field select {
+    max-width: none;
+}
+
+.dashboard-main .reserva-card .btn.primary {
+    margin-top: 4px;
+}
+
+.dashboard-main .reserva-feedback {
+    margin-top: 14px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.dashboard-main .reserva-feedback[data-status="success"] {
+    color: #23663b;
+}
+
+.dashboard-main .reserva-feedback[data-status="error"] {
+    color: #a52a20;
+}
+
+.dashboard-main .reserva-consultar {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.dashboard-main .reserva-consultar[hidden],
+.dashboard-main .reserva-feedback[hidden] {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .dashboard-main .reserva-card .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Organização visual: alterações exclusivas do dashboard real. */
+.dashboard-main .room-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: 14px;
+}
+
+.dashboard-main .room-card:hover {
+    border-color: var(--border);
+}
+
+.dashboard-main .room-card h3 {
+    white-space: normal;
+    overflow: visible;
+    font-size: 15px;
+}
+
+.dashboard-main .room-card p {
+    display: block;
+    font-size: 12px;
+}
+
+.dashboard-main .room-type {
+    display: inline;
+    font-size: 11px;
+}
+
+.dashboard-main .room-bottom {
+    font-size: 11px;
+}
+
+.dashboard-main .page-heading {
+    margin-bottom: 18px;
+}
+
+.dashboard-main .calendar-toolbar h2 {
+    font-size: 16px;
+}
+
+.dashboard-main .calendar-head > div,
+.dashboard-main .time-label {
+    font-size: 11px;
+}
+
+.dashboard-main .today-btn,
+.dashboard-main .date-input {
+    height: 34px;
+    font-size: 12px;
+}
+
+.dashboard-main .logout,
+.dashboard-main .calendar-footer {
+    font-size: 12px;
+}
+
+.dashboard-main .empty-rooms {
+    padding: 24px;
+}
+
+@media (max-width: 600px) {
+    .dashboard-main .room-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .dashboard-main .room-card {
+        padding: 12px;
+    }
+
+    .dashboard-main .room-card h3 {
+        font-size: 13px;
+    }
+
+    .dashboard-main .room-card p,
+    .dashboard-main .room-bottom {
+        font-size: 10px;
+    }
+
+    .dashboard-main .room-type {
+        font-size: 10px;
+    }
+
+    .dashboard-main .room-card:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 350px) {
+    .dashboard-main .room-grid {
+        grid-template-columns: 1fr;
+    }
+}

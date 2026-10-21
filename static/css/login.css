@@ -56,7 +56,7 @@
 }
 
 .brand-title span {
-    color: #ff5a24;
+    color: var(--salafacil-primary);
 }
 
 .brand-description {
@@ -74,7 +74,7 @@
     min-width: 0;
     margin: 0;
     padding: 2.5rem;
-    background: #ff5a24;
+    background: var(--salafacil-primary);
 }
 
 .form-content {

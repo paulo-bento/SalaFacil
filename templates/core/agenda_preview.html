@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Demonstração da agenda | SalaFácil!{% endblock %}
+
+{% block framework_css %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/agenda.css' %}">
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block main_class %}agenda-preview-main{% endblock %}
+
+{% block content %}
+<a class="skip-link" href="#app-content">Ir para o conteúdo</a>
+<div id="app"></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<dialog id="details-dialog" aria-labelledby="dialog-title"></dialog>
+<noscript>Ative o JavaScript para testar a demonstração da agenda.</noscript>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{% static 'js/agenda-demo.mjs' %}"></script>
+{% endblock %}

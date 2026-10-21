@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard | SalaFácil!{% endblock %}
+
+{% block framework_css %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/agenda.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block main_class %}agenda-preview-main dashboard-main{% endblock %}
+
+{% block content %}
+<a class="skip-link" href="#app-content">Ir para o conteúdo</a>
+<aside class="sidebar" id="sidebar">
+
+    <div class="brand">
+        <div>
+            <div class="brand-name">
+                Sala<span>Fácil</span>!
+            </div>
+            <div class="brand-caption">
+                UNIFIP · Campus Patos
+            </div>
+        </div>
+    </div>
+
+
+    <nav aria-label="Navegação principal">
+        <a href="{% url 'home' %}"
+           class="nav-item active"
+           aria-current="page">
+            Agenda de salas
+        </a>
+    </nav>
+
+</aside>
+
+<div class="workspace">
+    <header class="topbar">
+        <div class="breadcrumb">
+            UNIFIP <span>/</span>
+            <strong>Agenda de salas</strong>
+        </div>
+
+        <div class="mobile-brand">
+            <button type="button"
+                    class="menu-toggle"
+                    id="menu-toggle"
+                    aria-label="Abrir menu"
+                    aria-expanded="false">
+                ☰
+            </button>
+            <div>Sala<span>Fácil</span>!</div>
+        </div>
+
+        <div class="topbar-right">
+            <div class="user-info">
+                <div class="avatar">
+                    {{ user.email|slice:":1"|upper }}
+                </div>
+                <div>
+                    <strong>{{ user.email }}</strong>
+                    <small>
+                        {% if user.is_staff %}
+                            Administrador
+                        {% else %}
+                            Usuário
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout">
+                    Sair
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <div id="app-content" class="main-content">
+        <div class="page-heading">
+            <div>
+                <h1>Agenda de salas</h1>
+            </div>
+        </div>
+
+
+        <section class="room-grid" aria-label="Salas cadastradas">
+            {% for sala in salas %}
+                <article class="room-card">
+                    <div class="room-top">
+                        <div class="room-icon">
+                            <svg class="icon" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor"
+                                 stroke-width="2" aria-hidden="true">
+                                <path d="M4 21h16M6 21V4l11-2v19M17 5h3v16"/>
+                            </svg>
+                        </div>
+
+                        <span class="room-type">
+                            {{ sala.tipo }}
+                        </span>
+                    </div>
+
+                    <h3>{{ sala.nome }}</h3>
+                    <p>{{ sala.localizacao }}</p>
+
+                    <div class="room-bottom">
+                        <span>{{ sala.capacidade }} pessoas</span>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="card empty-rooms">
+                    <h2>Nenhuma sala disponível</h2>
+                    <p>Não há salas ativas cadastradas no momento.</p>
+                </div>
+            {% endfor %}
+        </section>
+
+
+        <section class="card reserva-card" aria-labelledby="reserva-titulo">
+            <div class="reserva-heading">
+                <div>
+                    <h2 id="reserva-titulo">Nova reserva</h2>
+                    <p>Selecione uma sala e o horário desejado.</p>
+                </div>
+            </div>
+
+            <form
+                id="reserva-form"
+                method="post"
+                action="{% url 'bookings:criar_reserva' %}"
+            >
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <div class="field">
+                        <label for="reserva-sala">Sala</label>
+                        <select id="reserva-sala" name="sala_id" required>
+                            <option value="">Selecione uma sala</option>
+
+                            {% for sala in salas %}
+                                <option value="{{ sala.id }}">
+                                    {{ sala.nome }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="reserva-data">Data</label>
+                        <input
+                            type="date"
+                            id="reserva-data"
+                            name="data"
+                            value="{{ data_agenda|date:'Y-m-d' }}"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="field">
+                        <label for="reserva-inicio">Início</label>
+                        <select id="reserva-inicio" name="inicio" required>
+                            <option value="">Selecione</option>
+
+                            {% for horario in horarios %}
+                                <option value="{{ horario }}">
+                                    {{ horario }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="reserva-fim">Término</label>
+                        <select id="reserva-fim" name="fim" required>
+                            <option value="">Selecione</option>
+
+                            {% for horario in horarios %}
+                                <option value="{{ horario }}">
+                                    {{ horario }}
+                                </option>
+                            {% endfor %}
+
+                            <option value="22:00">22:00</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="reserva-finalidade">Finalidade</label>
+                    <input
+                        type="text"
+                        id="reserva-finalidade"
+                        name="finalidade"
+                        maxlength="200"
+                        placeholder="Ex.: Aula de programação"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn primary" id="reserva-submit">
+                    Confirmar reserva
+                </button>
+
+                <p
+                    id="reserva-feedback"
+                    class="reserva-feedback"
+                    role="status"
+                    aria-live="polite"
+                    hidden
+                ></p>
+
+                <a
+                    id="reserva-consultar"
+                    class="reserva-consultar"
+                    href="{% url 'home' %}"
+                    hidden
+                >
+                    Atualizar agenda para visualizar a reserva
+                </a>
+            </form>
+        </section>
+
+
+        <section class="card calendar-card"
+                 aria-label="Agenda de horários">
+
+            <div class="calendar-toolbar">
+                <div>
+                    <h2>Agenda do dia</h2>
+                </div>
+
+                <form method="get" class="date-control">
+                    <input
+                        type="date"
+                        name="data"
+                        class="date-input"
+                        value="{{ data_agenda|date:'Y-m-d' }}"
+                        aria-label="Data da agenda"
+                    >
+
+                    <button type="submit" class="today-btn">
+                        Consultar
+                    </button>
+                </form>
+            </div>
+
+            <div class="calendar-subbar">
+                <div class="date-title">
+                    {{ data_agenda|date:"l, d \d\e F \d\e Y" }}
+                </div>
+            </div>
+
+            {% if salas %}
+                <div class="calendar-scroll"
+                     style="--room-count: {{ salas|length }};"
+                     tabindex="0"
+                     aria-label="Grade de horários">
+
+                    <div class="calendar-head">
+                        <div class="time-zone">Hora</div>
+
+                        {% for sala in salas %}
+                            <div>{{ sala.nome_curto }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="timeline">
+                        <div class="time-axis">
+                            {% for horario in horarios %}
+                                <div class="time-label">
+                                    {% if horario|slice:"-2:" == "00" %}
+                                        {{ horario }}
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+
+                        {% for item in grade %}
+                            <div class="room-column"
+                                 aria-label="{{ item.sala.nome }}">
+
+                                {% for intervalo in item.intervalos %}
+                                    {% if intervalo.ocupado %}
+                                        <div
+                                            class="slot slot-readonly slot-occupied"
+                                            aria-label="Reservado às {{ intervalo.hora }}"
+                                            title="Horário reservado"
+                                        ></div>
+                                    {% else %}
+                                        <div
+                                            class="slot slot-readonly"
+                                            aria-hidden="true"
+                                        ></div>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            {% endif %}
+
+
+            <div class="calendar-footer">
+                Horários destacados em laranja já estão reservados.
+            </div>
+
+        </section>
+
+
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const menuButton = document.querySelector("#menu-toggle");
+    const sidebar = document.querySelector("#sidebar");
+
+    const closeMenu = () => {
+        sidebar.classList.remove("open");
+        menuButton.setAttribute("aria-expanded", "false");
+    };
+
+    menuButton.addEventListener("click", () => {
+        const opened = sidebar.classList.toggle("open");
+        menuButton.setAttribute("aria-expanded", String(opened));
+    });
+
+    document.addEventListener("click", (event) => {
+        if (sidebar.classList.contains("open") &&
+            !sidebar.contains(event.target) &&
+            !menuButton.contains(event.target)) {
+            closeMenu();
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeMenu();
+    });
+</script>
+
+<script src="{% static 'js/reserva-form.js' %}" defer></script>
+
+{% endblock %}
