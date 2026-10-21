@@ -1,0 +1,77 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Criar conta | SalaFácil!{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
+{% endblock %}
+
+{% block main_class %}login-main{% endblock %}
+
+{% block content %}
+<section class="login-shell">
+    <div class="login-layout">
+        <section class="login-brand-panel">
+            <div class="brand-content">
+                <h1 class="brand-title">
+                    Sala<span>Fácil</span>!
+                </h1>
+
+                <p class="brand-description">
+                    Agende salas e auditórios de forma simples, fácil e eficiente.
+                </p>
+            </div>
+        </section>
+
+        <section class="login-form-panel register-form-panel">
+            <div class="form-content">
+                <header class="login-header">
+                    <h2>Criar sua conta</h2>
+                    <p>Preencha os campos para se cadastrar.</p>
+                </header>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="register-errors" role="alert">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                        <div class="register-field">
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                            {% if field.errors %}
+                                <div class="register-errors" role="alert">
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="login-submit-button">
+                        Criar conta
+                    </button>
+                </form>
+
+                <div class="login-divider">
+                    <span>ou</span>
+                </div>
+
+                <a href="{% url 'login' %}" class="secondary-action">
+                    Voltar para o login
+                </a>
+            </div>
+        </section>
+    </div>
+</section>
+{% endblock %}

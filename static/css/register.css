@@ -1,0 +1,38 @@
+
+/* Ajustes exclusivos do cadastro */
+
+.register-form-panel .login-header {
+    margin-bottom: 1.5rem;
+}
+
+.register-field {
+    margin-bottom: 1rem;
+}
+
+.register-form-panel input {
+    margin-bottom: 0;
+}
+
+.register-form-panel .login-submit-button {
+    margin-top: 0.5rem;
+}
+
+.register-form-panel .login-divider {
+    margin: 1.5rem 0;
+}
+
+.register-errors {
+    margin-top: 0.5rem;
+    color: #fff;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.register-errors ul {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.register-errors li {
+    color: #fff;
+}
