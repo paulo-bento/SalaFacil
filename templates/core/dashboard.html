@@ -329,6 +329,44 @@
         </section>
 
 
+        <section class="card minhas-reservas"
+                 aria-labelledby="minhas-reservas-titulo">
+
+            <h2 id="minhas-reservas-titulo">Minhas reservas</h2>
+
+            {% if minhas_reservas %}
+                <div class="minhas-reservas-scroll">
+                    <table class="minhas-reservas-tabela">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sala</th>
+                                <th scope="col">Data</th>
+                                <th scope="col">Início</th>
+                                <th scope="col">Término</th>
+                                <th scope="col">Finalidade</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reserva in minhas_reservas %}
+                                <tr>
+                                    <td>{{ reserva.sala.nome }}</td>
+                                    <td>{{ reserva.data|date:"d/m/Y" }}</td>
+                                    <td>{{ reserva.inicio|time:"H:i" }}</td>
+                                    <td>{{ reserva.fim|time:"H:i" }}</td>
+                                    <td>{{ reserva.finalidade }}</td>
+                                    <td>{{ reserva.get_status_display }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>Você ainda não possui reservas.</p>
+            {% endif %}
+
+        </section>
+
 
     </div>
 </div>
