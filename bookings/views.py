@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
-from .services import criar_reserva
+from .services import cancelar_reserva, criar_reserva
 
 
 @require_POST
@@ -95,4 +95,32 @@ def criar_reserva_view(request):
             "reserva_id": reserva.pk,
         },
         status=201,
+    )
+
+
+@require_POST
+def cancelar_reserva_view(request, reserva_id):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"erro": "É necessário estar autenticado."},
+            status=401,
+        )
+
+    try:
+        reserva = cancelar_reserva(
+            usuario=request.user,
+            reserva_id=reserva_id,
+        )
+    except ValidationError as erro:
+        return JsonResponse(
+            {"erro": " ".join(erro.messages)},
+            status=400,
+        )
+
+    return JsonResponse(
+        {
+            "mensagem": "Reserva cancelada com sucesso.",
+            "reserva_id": reserva.pk,
+        },
+        status=200,
     )

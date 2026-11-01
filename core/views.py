@@ -76,6 +76,20 @@ def home(request):
         .order_by("-data", "-inicio")
     )
 
+    agora = timezone.localtime()
+
+    for reserva in minhas_reservas:
+        reserva.pode_cancelar = (
+            reserva.status == Reserva.Status.CONFIRMADA
+            and (
+                reserva.data > agora.date()
+                or (
+                    reserva.data == agora.date()
+                    and reserva.inicio > agora.time()
+                )
+            )
+        )
+
     return render(request, "core/dashboard.html", {
         "salas": salas,
         "data_agenda": data_agenda,

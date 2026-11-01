@@ -347,3 +347,81 @@
         font-size: 16px;
     }
 }
+
+
+
+/* Ações das reservas */
+
+.minhas-reservas-tabela td:last-child {
+    text-align: center;
+}
+
+.minhas-reservas-tabela th:last-child {
+    text-align: center;
+}
+
+.btn-cancelar-reserva {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 7px 14px;
+    margin: 0;
+
+    background: #fff;
+    border: 1px solid #e4c9c5;
+    border-radius: 8px;
+
+    color: #b44738;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.btn-cancelar-reserva:hover:not(:disabled) {
+    background: #fff1ef;
+    border-color: #d98f85;
+    color: #9f3025;
+}
+
+.btn-cancelar-reserva:focus-visible {
+    outline: 2px solid #ff5a24;
+    outline-offset: 3px;
+}
+
+.btn-cancelar-reserva:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+
+/* Status das reservas */
+
+.reserva-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.reserva-status--confirmada {
+    background: #eaf5ee;
+    color: #276749;
+}
+
+.reserva-status--cancelada {
+    background: #f2f1ef;
+    color: #77736c;
+}

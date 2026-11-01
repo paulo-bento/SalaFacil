@@ -345,6 +345,7 @@
                                 <th scope="col">Término</th>
                                 <th scope="col">Finalidade</th>
                                 <th scope="col">Status</th>
+                                <th scope="col">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -355,7 +356,29 @@
                                     <td>{{ reserva.inicio|time:"H:i" }}</td>
                                     <td>{{ reserva.fim|time:"H:i" }}</td>
                                     <td>{{ reserva.finalidade }}</td>
-                                    <td>{{ reserva.get_status_display }}</td>
+
+                                    <td>
+                                        <span class="reserva-status reserva-status--{{ reserva.status }}">
+                                            {{ reserva.get_status_display }}
+                                        </span>
+                                    </td>
+
+
+                                    <td>
+                                        {% if reserva.pode_cancelar %}
+                                            <button
+                                                type="button"
+                                                class="btn-cancelar-reserva"
+                                                data-reserva-id="{{ reserva.pk }}"
+                                                aria-label="Cancelar reserva da sala {{ reserva.sala.nome }}"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        {% else %}
+                                            <span>—</span>
+                                        {% endif %}
+                                    </td>
+
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -401,5 +424,6 @@
 </script>
 
 <script src="{% static 'js/reserva-form.js' %}" defer></script>
+<script src="{% static 'js/cancelar-reserva.js' %}" defer></script>
 
 {% endblock %}
