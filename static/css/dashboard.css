@@ -276,3 +276,74 @@
     }
 }
 
+
+/* Minhas reservas */
+
+.minhas-reservas {
+    margin-top: 24px;
+    padding: 24px;
+}
+
+.minhas-reservas h2 {
+    margin: 0 0 20px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.minhas-reservas-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.minhas-reservas-tabela {
+    width: 100%;
+    min-width: 720px;
+    margin: 0;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.minhas-reservas-tabela th,
+.minhas-reservas-tabela td {
+    padding: 14px 16px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #ebe7e2;
+}
+
+.minhas-reservas-tabela th {
+    background: #f8f7f5;
+    color: #697386;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.minhas-reservas-tabela td {
+    color: #34332f;
+}
+
+.minhas-reservas-tabela tbody tr:hover {
+    background: #faf9f7;
+}
+
+.minhas-reservas-tabela tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.minhas-reservas-tabela td:nth-child(2),
+.minhas-reservas-tabela td:nth-child(3),
+.minhas-reservas-tabela td:nth-child(4),
+.minhas-reservas-tabela td:last-child {
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .minhas-reservas {
+        padding: 16px;
+    }
+
+    .minhas-reservas h2 {
+        font-size: 16px;
+    }
+}

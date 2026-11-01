@@ -69,11 +69,19 @@ def home(request):
             "intervalos": intervalos,
         })
 
+
+    minhas_reservas = (
+        Reserva.objects.filter(usuario=request.user)
+        .select_related("sala")
+        .order_by("-data", "-inicio")
+    )
+
     return render(request, "core/dashboard.html", {
         "salas": salas,
         "data_agenda": data_agenda,
         "horarios": horarios,
         "grade": grade,
+        "minhas_reservas": minhas_reservas,
     })
 
 
