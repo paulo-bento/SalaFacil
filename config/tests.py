@@ -3,8 +3,6 @@ Testes da configuração do projeto SalaFácil (pacote ``config``).
 
 Cobrem settings.py, urls.py, wsgi.py e asgi.py. Nenhum teste acessa o banco
 de dados (todos usam SimpleTestCase), então rodam mesmo sem o PostgreSQL ativo:
-
-    python manage.py test config
 """
 
 import importlib
