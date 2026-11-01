@@ -1,3 +1,4 @@
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
@@ -5,9 +6,20 @@ from .models import User
 
 
 class RegistrationForm(UserCreationForm):
+    first_name = forms.CharField(
+        label="Nome",
+        max_length=150,
+        required=True,
+    )
+    last_name = forms.CharField(
+        label="Sobrenome",
+        max_length=150,
+        required=True,
+    )
+
     class Meta:
         model = User
-        fields = ("email",)
+        fields = ("first_name", "last_name", "email")
 
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()

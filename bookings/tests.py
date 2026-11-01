@@ -13,6 +13,7 @@ from rooms.models import Sala
 
 from .models import Reserva
 from .services import criar_reserva
+from .services import cancelar_reserva
 
 
 class ReservaServiceTests(TestCase):
@@ -211,3 +212,180 @@ class CriarReservaHTTPTests(TestCase):
         resposta = self.client.get(self.url)
 
         self.assertEqual(resposta.status_code, 405)
+
+
+class CancelarReservaTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        from django.contrib.auth import get_user_model
+        from rooms.models import Sala
+
+        User = get_user_model()
+
+        cls.usuario = User.objects.create_user(
+            email="usuario@unifip.edu.br",
+            password="SenhaForte123!",
+        )
+        cls.outro_usuario = User.objects.create_user(
+            email="outro@unifip.edu.br",
+            password="SenhaForte123!",
+        )
+        cls.sala = Sala.objects.create(
+            nome="Sala de Testes",
+            capacidade=30,
+        )
+
+    def criar_reserva(self, *, dias=1):
+        return Reserva.objects.create(
+            sala=self.sala,
+            usuario=self.usuario,
+            data=timezone.localdate() + timedelta(days=dias),
+            inicio="09:00",
+            fim="10:00",
+            finalidade="Aula",
+        )
+
+    def test_cancelar_reserva_valida(self):
+        reserva = self.criar_reserva()
+
+        cancelar_reserva(
+            usuario=self.usuario,
+            reserva_id=reserva.pk,
+        )
+
+        reserva.refresh_from_db()
+        self.assertEqual(reserva.status, Reserva.Status.CANCELADA)
+
+    def test_impedir_cancelamento_de_outra_pessoa(self):
+        reserva = self.criar_reserva()
+
+        with self.assertRaises(ValidationError):
+            cancelar_reserva(
+                usuario=self.outro_usuario,
+                reserva_id=reserva.pk,
+            )
+
+        reserva.refresh_from_db()
+        self.assertEqual(reserva.status, Reserva.Status.CONFIRMADA)
+
+    def test_impedir_cancelamento_duplicado(self):
+        reserva = self.criar_reserva()
+
+        cancelar_reserva(
+            usuario=self.usuario,
+            reserva_id=reserva.pk,
+        )
+
+        with self.assertRaises(ValidationError):
+            cancelar_reserva(
+                usuario=self.usuario,
+                reserva_id=reserva.pk,
+            )
+
+    def test_impedir_cancelamento_de_reserva_passada(self):
+        reserva = self.criar_reserva(dias=-1)
+
+        with self.assertRaises(ValidationError):
+            cancelar_reserva(
+                usuario=self.usuario,
+                reserva_id=reserva.pk,
+            )
+
+        reserva.refresh_from_db()
+        self.assertEqual(reserva.status, Reserva.Status.CONFIRMADA)
+
+    def test_impedir_cancelamento_de_reserva_inexistente(self):
+        with self.assertRaises(ValidationError):
+            cancelar_reserva(
+                usuario=self.usuario,
+                reserva_id=999999,
+            )
+
+
+class CancelarReservaHTTPTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        from django.contrib.auth import get_user_model
+        from rooms.models import Sala
+
+        User = get_user_model()
+
+        cls.usuario = User.objects.create_user(
+            email="cancelamento@unifip.edu.br",
+            password="SenhaForte123!",
+        )
+        cls.outro_usuario = User.objects.create_user(
+            email="outro.cancelamento@unifip.edu.br",
+            password="SenhaForte123!",
+        )
+        cls.sala = Sala.objects.create(
+            nome="Sala para Cancelamento HTTP",
+            capacidade=30,
+        )
+
+    def criar_reserva(self):
+        return Reserva.objects.create(
+            sala=self.sala,
+            usuario=self.usuario,
+            data=timezone.localdate() + timedelta(days=1),
+            inicio="09:00",
+            fim="10:00",
+            finalidade="Aula de teste",
+        )
+
+    def test_cancelamento_valido(self):
+        reserva = self.criar_reserva()
+        self.client.force_login(self.usuario)
+
+        resposta = self.client.post(
+            reverse("bookings:cancelar_reserva", args=[reserva.pk])
+        )
+
+        self.assertEqual(resposta.status_code, 200)
+
+        reserva.refresh_from_db()
+        self.assertEqual(reserva.status, Reserva.Status.CANCELADA)
+
+    def test_cancelamento_exige_autenticacao(self):
+        reserva = self.criar_reserva()
+
+        resposta = self.client.post(
+            reverse("bookings:cancelar_reserva", args=[reserva.pk])
+        )
+
+        self.assertEqual(resposta.status_code, 401)
+
+    def test_cancelamento_exige_post(self):
+        reserva = self.criar_reserva()
+        self.client.force_login(self.usuario)
+
+        resposta = self.client.get(
+            reverse("bookings:cancelar_reserva", args=[reserva.pk])
+        )
+
+        self.assertEqual(resposta.status_code, 405)
+
+    def test_nao_permite_cancelar_reserva_de_outro_usuario(self):
+        reserva = self.criar_reserva()
+        self.client.force_login(self.outro_usuario)
+
+        resposta = self.client.post(
+            reverse("bookings:cancelar_reserva", args=[reserva.pk])
+        )
+
+        self.assertEqual(resposta.status_code, 400)
+
+        reserva.refresh_from_db()
+        self.assertEqual(reserva.status, Reserva.Status.CONFIRMADA)
+
+    def test_nao_permite_cancelar_duas_vezes(self):
+        reserva = self.criar_reserva()
+        self.client.force_login(self.usuario)
+
+        url = reverse("bookings:cancelar_reserva", args=[reserva.pk])
+
+        primeira_resposta = self.client.post(url)
+        segunda_resposta = self.client.post(url)
+
+        self.assertEqual(primeira_resposta.status_code, 200)
+        self.assertEqual(segunda_resposta.status_code, 400)

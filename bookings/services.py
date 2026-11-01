@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import datetime, time
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -79,3 +79,38 @@ def criar_reserva(*, usuario, sala_id, data, inicio, fim, finalidade):
         finalidade=finalidade,
         status=Reserva.Status.CONFIRMADA,
     )
+
+
+@transaction.atomic
+def cancelar_reserva(*, usuario, reserva_id):
+    if not usuario.is_authenticated or not usuario.is_active:
+        raise ValidationError("Usuário não autorizado.")
+
+    try:
+        reserva = (
+            Reserva.objects.select_for_update()
+            .get(pk=reserva_id)
+        )
+    except Reserva.DoesNotExist:
+        raise ValidationError("Reserva não encontrada.")
+
+    if reserva.usuario_id != usuario.pk:
+        raise ValidationError("Você não pode cancelar esta reserva.")
+
+    if reserva.status == Reserva.Status.CANCELADA:
+        raise ValidationError("Esta reserva já está cancelada.")
+
+    inicio_reserva = timezone.make_aware(
+        datetime.combine(reserva.data, reserva.inicio),
+        timezone.get_current_timezone(),
+    )
+
+    if inicio_reserva <= timezone.now():
+        raise ValidationError(
+            "Não é permitido cancelar uma reserva após seu início."
+        )
+
+    reserva.status = Reserva.Status.CANCELADA
+    reserva.save(update_fields=["status"])
+
+    return reserva
