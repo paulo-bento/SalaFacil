@@ -12,7 +12,22 @@ from rooms.models import Sala
 
 @login_required(login_url="login")
 def home(request):
-    salas = list(Sala.objects.filter(ativa=True))
+
+    salas_query = Sala.objects.filter(ativa=True)
+
+    tipos_sala = list(
+        salas_query.order_by("tipo")
+        .values_list("tipo", flat=True)
+        .distinct()
+    )
+
+    tipo_selecionado = request.GET.get("tipo", "")
+
+    if tipo_selecionado:
+        salas_query = salas_query.filter(tipo=tipo_selecionado)
+
+    salas = list(salas_query)
+
 
     data_agenda = timezone.localdate()
     data_parametro = request.GET.get("data")
@@ -90,13 +105,17 @@ def home(request):
             )
         )
 
+
     return render(request, "core/dashboard.html", {
         "salas": salas,
+        "tipos_sala": tipos_sala,
+        "tipo_selecionado": tipo_selecionado,
         "data_agenda": data_agenda,
         "horarios": horarios,
         "grade": grade,
         "minhas_reservas": minhas_reservas,
     })
+
 
 
 def agenda_preview(request):

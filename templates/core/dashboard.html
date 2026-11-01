@@ -248,11 +248,29 @@
                     <h2>Agenda do dia</h2>
                 </div>
 
+
                 <form method="get" class="date-control">
+                    <select
+                        name="tipo"
+                        class="date-input"
+                        aria-label="Filtrar por tipo de sala"
+                    >
+                        <option value="">Todos os tipos</option>
+
+                        {% for tipo in tipos_sala %}
+                            <option
+                                value="{{ tipo }}"
+                                {% if tipo == tipo_selecionado %}selected{% endif %}
+                            >
+                                {{ tipo }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
                     <input
                         type="date"
                         name="data"
-                        class="date-input"
+                        class="tipo-sala-input"
                         value="{{ data_agenda|date:'Y-m-d' }}"
                         aria-label="Data da agenda"
                     >
@@ -261,6 +279,7 @@
                         Consultar
                     </button>
                 </form>
+
             </div>
 
             <div class="calendar-subbar">

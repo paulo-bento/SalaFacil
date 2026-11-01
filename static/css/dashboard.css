@@ -425,3 +425,53 @@
     background: #f2f1ef;
     color: #77736c;
 }
+
+
+
+/* RF08 — Filtro por tipo de sala */
+
+.dashboard-main .calendar-toolbar {
+    gap: 16px;
+}
+
+.dashboard-main .date-control {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.dashboard-main .tipo-sala-input {
+    width: 180px;
+    min-width: 0;
+    height: 36px;
+    margin: 0;
+    padding: 0 30px 0 12px;
+    border: 1px solid #e8e4df;
+    border-radius: 7px;
+    background-color: #fff;
+    color: #34332f;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.dashboard-main .tipo-sala-input:focus-visible {
+    outline: 2px solid #ff5a24;
+    outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-main .calendar-toolbar {
+        align-items: stretch;
+    }
+
+    .dashboard-main .date-control {
+        width: 100%;
+    }
+
+    .dashboard-main .tipo-sala-input {
+        flex: 1 1 160px;
+        width: auto;
+    }
+}
