@@ -475,3 +475,134 @@
         width: auto;
     }
 }
+
+
+
+/* RF07 — Detalhes da reserva */
+
+.dashboard-main #reserva-detalhes {
+    width: min(420px, calc(100% - 32px));
+    max-height: calc(100dvh - 32px);
+    margin: auto;
+    padding: 28px;
+    overflow-y: auto;
+
+    background: #fff;
+    border: 1px solid #e8e4df;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgb(0 0 0 / 18%);
+
+    color: #34332f;
+}
+
+.dashboard-main #reserva-detalhes::backdrop {
+    background: rgb(25 24 22 / 55%);
+}
+
+.dashboard-main #detalhes-titulo {
+    margin: 0 0 24px;
+    color: #302f29;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+}
+
+.dashboard-main #reserva-detalhes dl {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr);
+    gap: 14px 12px;
+    margin: 0;
+}
+
+.dashboard-main #reserva-detalhes dt {
+    color: #77736c;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.dashboard-main #reserva-detalhes dd {
+    min-width: 0;
+    margin: 0;
+    color: #34332f;
+    font-size: 13px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-main #detalhes-finalidade-container {
+    margin-top: 14px;
+}
+
+.dashboard-main #detalhes-finalidade-container[hidden] {
+    display: none;
+}
+
+.dashboard-main #fechar-detalhes {
+    display: block;
+    width: 100%;
+    min-height: 42px;
+    margin: 28px 0 0;
+    padding: 10px 16px;
+
+    background: #ff5a24;
+    border: 1px solid #ff5a24;
+    border-radius: 9px;
+
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.dashboard-main #fechar-detalhes:hover {
+    background: #e84c19;
+    border-color: #e84c19;
+}
+
+.dashboard-main #fechar-detalhes:focus-visible {
+    outline: 2px solid #ff5a24;
+    outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+    .dashboard-main #reserva-detalhes {
+        padding: 20px;
+    }
+
+    .dashboard-main #reserva-detalhes dl {
+        grid-template-columns: 76px minmax(0, 1fr);
+        gap: 12px 8px;
+    }
+}
+
+
+
+/* Horários interativos da agenda */
+
+
+.dashboard-main .slot-details {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 33px;
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+    border-radius: 0;
+    cursor: pointer;
+    appearance: none;
+}
+
+
+.dashboard-main .slot-details:hover {
+    filter: brightness(0.9);
+}
+
+.dashboard-main .slot-details:focus-visible {
+    position: relative;
+    z-index: 1;
+    outline: 2px solid #302f29;
+    outline-offset: -2px;
+}

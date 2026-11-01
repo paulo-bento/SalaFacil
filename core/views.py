@@ -68,16 +68,27 @@ def home(request):
     for sala in salas:
         intervalos = []
 
+
         for horario in horarios_obj:
-            ocupado = any(
-                reserva.inicio <= horario < reserva.fim
-                for reserva in reservas_por_sala[sala.pk]
+            reserva_intervalo = next(
+                (
+                    reserva
+                    for reserva in reservas_por_sala[sala.pk]
+                    if reserva.inicio <= horario < reserva.fim
+                ),
+                None,
             )
 
             intervalos.append({
                 "hora": horario.strftime("%H:%M"),
-                "ocupado": ocupado,
+                "ocupado": reserva_intervalo is not None,
+                "reserva": reserva_intervalo,
+                "minha_reserva": (
+                    reserva_intervalo is not None
+                    and reserva_intervalo.usuario_id == request.user.pk
+                ),
             })
+
 
         grade.append({
             "sala": sala,

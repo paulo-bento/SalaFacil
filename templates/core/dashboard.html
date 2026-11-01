@@ -319,18 +319,28 @@
                                  aria-label="{{ item.sala.nome }}">
 
                                 {% for intervalo in item.intervalos %}
-                                    {% if intervalo.ocupado %}
-                                        <div
-                                            class="slot slot-readonly slot-occupied"
-                                            aria-label="Reservado às {{ intervalo.hora }}"
-                                            title="Horário reservado"
-                                        ></div>
-                                    {% else %}
-                                        <div
-                                            class="slot slot-readonly"
-                                            aria-hidden="true"
-                                        ></div>
-                                    {% endif %}
+
+                                {% if intervalo.ocupado %}
+                                    <button
+                                        type="button"
+                                        class="slot slot-readonly slot-occupied slot-details"
+                                        aria-label="Ver reserva da sala {{ item.sala.nome }} às {{ intervalo.hora }}"
+                                        data-sala="{{ item.sala.nome }}"
+                                        data-data="{{ data_agenda|date:'d/m/Y' }}"
+                                        data-inicio="{{ intervalo.reserva.inicio|time:'H:i' }}"
+                                        data-fim="{{ intervalo.reserva.fim|time:'H:i' }}"
+                                        data-status="Reservada"
+                                        {% if intervalo.minha_reserva %}
+                                            data-finalidade="{{ intervalo.reserva.finalidade }}"
+                                        {% endif %}
+                                    ></button>
+                                {% else %}
+                                    <div
+                                        class="slot slot-readonly"
+                                        aria-hidden="true"
+                                    ></div>
+                                {% endif %}
+
                                 {% endfor %}
 
                             </div>
@@ -346,6 +356,36 @@
             </div>
 
         </section>
+
+
+        <dialog id="reserva-detalhes" aria-labelledby="detalhes-titulo">
+            <h2 id="detalhes-titulo">Detalhes da reserva</h2>
+
+            <dl>
+                <dt>Sala</dt>
+                <dd id="detalhes-sala"></dd>
+
+                <dt>Data</dt>
+                <dd id="detalhes-data"></dd>
+
+                <dt>Horário</dt>
+                <dd id="detalhes-horario"></dd>
+
+                <dt>Situação</dt>
+                <dd id="detalhes-status"></dd>
+            </dl>
+
+            <div id="detalhes-finalidade-container" hidden>
+                <dl>
+                    <dt>Finalidade</dt>
+                    <dd id="detalhes-finalidade"></dd>
+                </dl>
+            </div>
+
+            <button type="button" id="fechar-detalhes">
+                Fechar
+            </button>
+        </dialog>
 
 
         <section class="card minhas-reservas"
@@ -444,5 +484,6 @@
 
 <script src="{% static 'js/reserva-form.js' %}" defer></script>
 <script src="{% static 'js/cancelar-reserva.js' %}" defer></script>
+<script src="{% static 'js/reserva-detalhes.js' %}" defer></script>
 
 {% endblock %}
