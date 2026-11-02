@@ -250,3 +250,38 @@
         font-size: 0.9rem;
     }
 }
+
+
+/* Recuperação de senha */
+
+
+/* Recuperação de senha */
+
+.login-form-panel .password-reset-link {
+    display: block;
+    width: fit-content;
+    margin: 8px auto 20px;
+
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: center;
+    text-decoration: none;
+
+    opacity: 0.9;
+    transition: opacity 0.15s ease;
+}
+
+.login-form-panel .password-reset-link:hover {
+    color: #ffffff;
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.login-form-panel .password-reset-link:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 4px;
+    border-radius: 3px;
+}
