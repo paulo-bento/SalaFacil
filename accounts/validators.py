@@ -2,7 +2,11 @@
 from django.core.exceptions import ValidationError
 
 
-ALLOWED_EMAIL_DOMAINS = {"unifip.edu.br", "gmail.com"}
+ALLOWED_EMAIL_DOMAINS = {
+    "unifip.edu.br",
+    "ads.fiponline.edu.br",
+    "gmail.com",
+}
 
 
 def validate_institutional_email(email: str) -> None:
