@@ -1,0 +1,456 @@
+body {
+    margin: 0;
+    background: var(--salafacil-canvas);
+}
+
+.auth-entry {
+    --auth-ink: var(--salafacil-dark);
+    --auth-muted: var(--salafacil-muted);
+    --auth-border: var(--salafacil-border);
+    --auth-link: var(--salafacil-link);
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: clamp(16px, 4vw, 48px);
+    background: var(--salafacil-canvas);
+    color: var(--auth-ink);
+    color-scheme: light;
+    font: 1rem/1.5 var(--salafacil-font);
+}
+
+.auth-entry,
+.auth-entry * {
+    box-sizing: border-box;
+}
+
+.auth-card {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    width: min(100%, 960px);
+    min-height: 470px;
+    overflow: hidden;
+    border: 1px solid var(--auth-border);
+    border-radius: 22px;
+    background: var(--salafacil-surface);
+    box-shadow: 0 22px 60px #302f291a;
+}
+
+.auth-brand {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 40px;
+    padding: clamp(24px, 4vw, 42px);
+    background: var(--auth-ink);
+    color: #fdf5ed;
+}
+
+.auth-wordmark {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -.055em;
+    line-height: 1.05;
+}
+
+.auth-wordmark span {
+    color: var(--salafacil-primary);
+}
+
+.auth-campus {
+    margin: 10px 0 0;
+    color: #d0c6bc;
+    font-size: .75rem;
+    letter-spacing: .03em;
+}
+
+.auth-brand-detail p {
+    max-width: 22ch;
+    margin: 0 0 20px;
+    font-size: 1.125rem;
+    line-height: 1.45;
+}
+
+.auth-calendar {
+    --auth-calendar-linha: 18px;
+    --auth-calendar-divisoria: #ffffff16;
+    --auth-calendar-marca: #fdf5ed35;
+    max-width: 300px;
+    overflow: hidden;
+    border: 1px solid #ffffff2b;
+    border-radius: 10px;
+    background: var(--salafacil-dark-hover);
+}
+
+.auth-calendar-colunas,
+.auth-calendar-grade {
+    display: grid;
+    grid-template-columns: 28px repeat(4, minmax(0, 1fr));
+}
+
+.auth-calendar-colunas {
+    min-height: 25px;
+    border-bottom: 1px solid var(--auth-calendar-divisoria);
+    background: #ffffff08;
+}
+
+.auth-calendar-colunas span {
+    display: grid;
+    place-items: center;
+}
+
+.auth-calendar-colunas span::before {
+    content: "";
+    width: 38%;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--auth-calendar-marca);
+}
+
+.auth-calendar-grade {
+    position: relative;
+}
+
+.auth-calendar-grade::before {
+    content: "";
+    position: absolute;
+    inset: calc(var(--auth-calendar-linha) - 1px) 0 auto 28px;
+    height: 1px;
+    background: var(--auth-calendar-divisoria);
+    box-shadow:
+        0 var(--auth-calendar-linha) var(--auth-calendar-divisoria),
+        0 calc(2 * var(--auth-calendar-linha)) var(--auth-calendar-divisoria),
+        0 calc(3 * var(--auth-calendar-linha)) var(--auth-calendar-divisoria),
+        0 calc(4 * var(--auth-calendar-linha)) var(--auth-calendar-divisoria);
+}
+
+.auth-calendar-sala,
+.auth-calendar-colunas span + span {
+    border-inline-start: 1px solid var(--auth-calendar-divisoria);
+}
+
+.auth-calendar-sala {
+    display: grid;
+    grid-template-rows: repeat(6, var(--auth-calendar-linha));
+}
+
+.auth-calendar-horas {
+    background: #ffffff05;
+}
+
+.auth-calendar-horas::before {
+    content: "";
+    display: block;
+    width: 7px;
+    height: 2px;
+    margin: calc(var(--auth-calendar-linha) / 2 - 1px) auto 0;
+    border-radius: 2px;
+    background: var(--auth-calendar-marca);
+    box-shadow:
+        0 var(--auth-calendar-linha) var(--auth-calendar-marca),
+        0 calc(2 * var(--auth-calendar-linha)) var(--auth-calendar-marca),
+        0 calc(3 * var(--auth-calendar-linha)) var(--auth-calendar-marca),
+        0 calc(4 * var(--auth-calendar-linha)) var(--auth-calendar-marca),
+        0 calc(5 * var(--auth-calendar-linha)) var(--auth-calendar-marca);
+}
+
+.auth-calendar-reserva {
+    position: relative;
+    border-inline-start: 2px solid;
+}
+
+.auth-calendar-reserva-lab {
+    grid-row: 3 / 7;
+    border-color: var(--salafacil-primary);
+    background: #683920;
+}
+
+.auth-calendar-reserva-estudos {
+    grid-row: 1 / 4;
+    border-color: #e6af8f;
+    background: #514238;
+}
+
+.auth-calendar-reserva-multiuso {
+    grid-row: 2 / 6;
+    border-color: #ff925f;
+    background: var(--salafacil-primary);
+}
+
+.auth-panel {
+    display: grid;
+    align-items: center;
+    min-width: 0;
+    padding: clamp(24px, 4vw, 44px);
+}
+
+.auth-content {
+    width: min(100%, 440px);
+    margin-inline: auto;
+}
+
+.auth-header {
+    margin-bottom: 22px;
+}
+
+.auth-header h1 {
+    margin: 0;
+    font-size: clamp(1.65rem, 4vw, 2rem);
+    line-height: 1.15;
+    letter-spacing: -.04em;
+}
+
+.auth-header p {
+    margin: 6px 0 0;
+    color: var(--auth-muted);
+    font-size: .875rem;
+}
+
+.auth-form {
+    display: grid;
+    gap: 14px;
+}
+
+.auth-form-register {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.auth-full {
+    grid-column: 1 / -1;
+}
+
+.auth-field {
+    display: grid;
+    align-content: start;
+    gap: 5px;
+    min-width: 0;
+}
+
+.auth-field label {
+    font-size: .8125rem;
+    font-weight: 650;
+}
+
+.auth-field input {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--auth-border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--auth-ink);
+    font: inherit;
+}
+
+.auth-field input::placeholder {
+    color: #77716a;
+}
+
+.auth-field input[aria-invalid="true"] {
+    border-color: #b04232;
+}
+
+.auth-recovery {
+    justify-self: end;
+}
+
+.auth-perfis {
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+.auth-perfis legend {
+    margin-bottom: 5px;
+    padding: 0;
+    font-size: .8125rem;
+    font-weight: 650;
+}
+
+.auth-perfis-opcoes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--auth-border);
+    border-radius: 10px;
+    background: var(--salafacil-canvas);
+}
+
+.auth-perfis label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 6px 8px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    color: var(--auth-muted);
+    font-size: .875rem;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.auth-perfis label:hover {
+    background: var(--salafacil-surface);
+}
+
+.auth-perfis label:has(input:checked) {
+    border-color: var(--auth-link);
+    background: var(--salafacil-tint);
+    color: var(--auth-link);
+}
+
+.auth-perfis label:has(input:focus-visible) {
+    outline: 2px solid var(--auth-link);
+    outline-offset: 1px;
+}
+
+.auth-perfis input {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--auth-link);
+}
+
+.auth-entry .auth-perfis input:focus-visible {
+    outline: none;
+}
+
+.auth-entry a {
+    color: var(--auth-link);
+    font-size: .875rem;
+    font-weight: 650;
+    text-underline-offset: 3px;
+}
+
+.auth-entry a:hover {
+    color: #732b14;
+}
+
+.auth-entry :focus-visible {
+    outline: 2px solid var(--auth-link);
+    outline-offset: 3px;
+}
+
+.auth-entry .auth-submit {
+    display: grid;
+    place-items: center;
+    min-height: 44px;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: var(--auth-ink);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.auth-entry .auth-submit:hover {
+    background: var(--salafacil-dark-hover);
+    color: #fff;
+}
+
+.auth-switch {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--auth-border);
+    color: var(--auth-muted);
+    font-size: .875rem;
+}
+
+.auth-switch:empty {
+    display: none;
+}
+
+.auth-switch a:not(:first-child) {
+    margin-inline-start: 4px;
+}
+
+.auth-error,
+.auth-field-error {
+    margin: 0;
+    color: #972d23;
+    font-size: .8125rem;
+    overflow-wrap: anywhere;
+}
+
+.auth-error {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--salafacil-tint);
+}
+
+.auth-form .errorlist {
+    margin: 0;
+    padding-left: 1rem;
+}
+
+@media (max-width: 720px) {
+    .auth-card {
+        grid-template-columns: 1fr;
+        width: min(100%, 480px);
+        min-height: 0;
+        border-radius: 16px;
+    }
+
+    .auth-brand {
+        padding-block: 20px;
+    }
+
+    .auth-brand-detail {
+        display: none;
+    }
+}
+
+@media (max-width: 440px) {
+    .auth-panel {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 359px) {
+    .auth-form-register {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 721px) and (max-height: 620px) {
+    .auth-entry {
+        padding-block: 16px;
+    }
+
+    .auth-card {
+        min-height: 0;
+    }
+
+    .auth-brand,
+    .auth-panel {
+        padding-block: 24px;
+    }
+
+    .auth-calendar {
+        --auth-calendar-linha: 14px;
+    }
+
+    .auth-header {
+        margin-bottom: 16px;
+    }
+
+    .auth-form {
+        gap: 12px;
+    }
+
+    .auth-switch {
+        margin-top: 14px;
+        padding-top: 10px;
+    }
+}

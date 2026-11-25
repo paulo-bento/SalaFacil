@@ -1,7 +1,8 @@
-from django.test import TestCase
+from django.test import Client, TestCase
 
 from .forms import RegistrationForm
 from .models import User
+from rooms.models import Sala
 
 
 from django.core import mail
@@ -10,6 +11,65 @@ from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
+
+
+class MinhaContaTests(TestCase):
+    senha_atual = "SenhaInicial123!"
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.usuario = User.objects.create_user(
+            email="minha-conta@unifip.edu.br", password=cls.senha_atual,
+            first_name="Maria", last_name="Silva", perfil=User.Perfil.PROFESSOR,
+        )
+
+    def setUp(self) -> None:
+        self.url = reverse("configuracoes")
+        self.client = Client(enforce_csrf_checks=True)
+        self.client.force_login(self.usuario)
+        self.client.get(self.url)
+
+    def enviar(self, acao: str, **dados: str):
+        return self.client.post(self.url, {
+            **dados, "acao": acao,
+            "csrfmiddlewaretoken": self.client.cookies["csrftoken"].value,
+        })
+
+    def test_edita_apenas_os_nomes_da_conta_autenticada(self) -> None:
+        resposta = self.enviar(
+            "dados_pessoais", first_name="  Ana Maria  ", last_name="Souza",
+            email="outro@unifip.edu.br", perfil=User.Perfil.ALUNO,
+        )
+        self.assertRedirects(resposta, self.url + "#dados-pessoais", fetch_redirect_response=False)
+        self.usuario.refresh_from_db()
+        self.assertEqual(self.usuario.first_name, "Ana Maria")
+        self.assertEqual(self.usuario.last_name, "Souza")
+        self.assertEqual(self.usuario.email, "minha-conta@unifip.edu.br")
+        self.assertEqual(self.usuario.perfil, User.Perfil.PROFESSOR)
+        pagina = self.client.get(self.url)
+        self.assertContains(pagina, "Ana Maria")
+        self.assertContains(
+            pagina, 'data-aviso-inicial="success">Dados pessoais atualizados.',
+        )
+
+    def test_nome_invalido_ou_sem_csrf_nao_altera_dados(self) -> None:
+        resposta = self.client.post(self.url, {
+            "acao": "dados_pessoais", "first_name": "Ana", "last_name": "Souza",
+        })
+        self.assertEqual(resposta.status_code, 403)
+        resposta = self.enviar("dados_pessoais", first_name="Ana", last_name="")
+        self.assertIn("last_name", resposta.context["dados_pessoais"].errors)
+        self.usuario.refresh_from_db()
+        self.assertEqual(self.usuario.first_name, "Maria")
+        self.assertEqual(self.usuario.last_name, "Silva")
+
+    def test_configuracoes_rejeita_troca_de_senha(self) -> None:
+        self.assertNotContains(self.client.get(self.url), 'name="old_password"')
+        resposta = self.enviar("alterar_senha", old_password=self.senha_atual)
+        self.assertEqual(resposta.status_code, 400)
+        self.usuario.refresh_from_db()
+        self.assertTrue(self.usuario.check_password(self.senha_atual))
+
 
 class RegistrationFormTests(TestCase):
     def setUp(self):
@@ -96,6 +156,7 @@ class RegistrationViewTests(TestCase):
                 "email": "maria@unifip.edu.br",
                 "password1": "SenhaSegura123!",
                 "password2": "SenhaSegura123!",
+                "perfil": User.Perfil.PROFESSOR,
             },
         )
 
@@ -106,7 +167,82 @@ class RegistrationViewTests(TestCase):
 
         self.assertEqual(usuario.first_name, "Maria")
         self.assertEqual(usuario.last_name, "Silva")
+        self.assertEqual(usuario.perfil, User.Perfil.ALUNO)
         self.assertTrue(usuario.check_password("SenhaSegura123!"))
+
+
+class PerfilAcademicoTests(TestCase):
+    senha = "SenhaSegura123!"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.aluno = User.objects.create_user(email="aluno@unifip.edu.br", password=cls.senha)
+        cls.professor = User.objects.create_user(
+            email="professor@unifip.edu.br", password=cls.senha, perfil=User.Perfil.PROFESSOR,
+        )
+        cls.administrador = User.objects.create_superuser(
+            email="admin.perfil@unifip.edu.br", password=cls.senha,
+        )
+
+    def test_login_por_email_e_senha_exige_perfil_correspondente(self):
+        for usuario in (self.aluno, self.professor):
+            with self.subTest(perfil=usuario.perfil):
+                resposta = self.client.post(reverse("login"), {
+                    "email": usuario.email, "password": self.senha, "perfil": usuario.perfil,
+                })
+                self.assertRedirects(resposta, reverse("home"))
+                self.assertEqual(self.client.session["_auth_user_id"], str(usuario.pk))
+                self.client.logout()
+
+    def test_perfil_incorreto_ou_ausente_falha_com_mensagem_generica(self):
+        for email, perfil in ((self.aluno.email, "professor"), ("ausente@unifip.edu.br", "professor"),
+                              (self.aluno.email, ""), (self.aluno.email, "admin")):
+            with self.subTest(email=email, perfil=perfil):
+                resposta = self.client.post(reverse("login"), {
+                    "email": email, "password": self.senha, "perfil": perfil,
+                })
+                self.assertContains(resposta, "E-mail, senha ou perfil inválidos.")
+                self.assertNotIn("_auth_user_id", self.client.session)
+        self.aluno.refresh_from_db()
+        self.assertEqual(self.aluno.perfil, User.Perfil.ALUNO)
+
+    def test_login_admin_independe_da_escolha_de_perfil(self):
+        resposta = self.client.post(reverse("admin:login"), {
+            "username": self.administrador.email, "password": self.senha, "next": reverse("admin:index"),
+        })
+        self.assertRedirects(resposta, reverse("admin:index"))
+
+    def test_somente_admin_autorizado_pode_alterar_perfil(self):
+        url = reverse("admin:accounts_user_change", args=[self.aluno.pk])
+        dados = {
+            "email": self.aluno.email, "perfil": User.Perfil.PROFESSOR, "is_active": "on",
+            "date_joined_0": "2026-11-15", "date_joined_1": "10:00:00",
+        }
+        self.client.force_login(self.aluno)
+        self.assertEqual(self.client.post(url, dados).status_code, 302)
+        self.aluno.refresh_from_db()
+        self.assertEqual(self.aluno.perfil, User.Perfil.ALUNO)
+
+        self.client.force_login(self.administrador)
+        self.assertRedirects(self.client.post(url, dados), reverse("admin:accounts_user_changelist"))
+        self.aluno.refresh_from_db()
+        self.assertEqual(self.aluno.perfil, User.Perfil.PROFESSOR)
+        self.assertFalse(self.aluno.is_staff)
+
+    def test_admin_pode_autorizar_sala_para_alunos(self):
+        campos = {"nome": "Sala de Estudos", "nome_curto": "Estudos", "tipo": "Estudo",
+                  "localizacao": "Bloco A", "capacidade": 20}
+        sala = Sala.objects.create(**campos)
+        self.assertFalse(sala.permite_reserva_aluno)
+        self.client.force_login(self.administrador)
+
+        resposta = self.client.post(reverse("admin:rooms_sala_change", args=[sala.pk]), {
+            **campos, "ativa": "on", "permite_reserva_aluno": "on",
+        })
+
+        self.assertRedirects(resposta, reverse("admin:rooms_sala_changelist"))
+        sala.refresh_from_db()
+        self.assertTrue(sala.permite_reserva_aluno)
 
 
 @override_settings(

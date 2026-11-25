@@ -1,0 +1,15 @@
+{% if formulario.non_field_errors %}
+    <div role="alert">{{ formulario.non_field_errors }}</div>
+{% endif %}
+{% for campo in formulario %}
+    <div class="field">
+        {{ campo.label_tag }}
+        {{ campo }}
+        {% if campo.errors %}
+            <div role="alert">{{ campo.errors }}</div>
+        {% endif %}
+        {% if campo.help_text %}
+            <div class="hint" id="{{ campo.auto_id }}_helptext">{{ campo.help_text }}</div>
+        {% endif %}
+    </div>
+{% endfor %}

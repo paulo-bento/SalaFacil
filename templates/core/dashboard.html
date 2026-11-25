@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static l10n %}
 
-{% block title %}Dashboard | SalaFácil!{% endblock %}
+{% block title %}{{ titulo_pagina }} | SalaFácil!{% endblock %}
 
 {% block framework_css %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/agenda.css' %}">
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=11">
 {% endblock %}
 
 {% block main_class %}agenda-preview-main dashboard-main{% endblock %}
@@ -29,10 +29,11 @@
 
 
 
-    <nav aria-label="Navegação principal">
+    <nav id="navegacao-dashboard" aria-label="Navegação principal"
+         data-usuario="{{ user.pk }}">
         <a href="{% url 'home' %}"
-           class="nav-item active"
-           aria-current="page">
+           class="nav-item{% if pagina_atual == 'agenda' %} active{% endif %}"
+           {% if pagina_atual == 'agenda' %}aria-current="page"{% endif %}>
 
             <svg class="icon" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor"
@@ -43,6 +44,37 @@
 
             <span>Agenda de salas</span>
         </a>
+        <a href="{% url 'minhas_reservas' %}"
+           class="nav-item{% if pagina_atual == 'reservas' %} active{% endif %}"
+           {% if pagina_atual == 'reservas' %}aria-current="page"{% endif %}>
+            <svg class="icon" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor"
+                 stroke-width="2" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                <rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            <span>Minhas reservas</span>
+        </a>
+        <a href="{% url 'notificacoes' %}"
+           class="nav-item{% if pagina_atual == 'notificacoes' %} active{% endif %}"
+           data-link-notificacoes aria-label="Notificações{% if avisos_notificacoes_ativos and notificacoes_nao_lidas %}: {{ notificacoes_nao_lidas }} não lida{{ notificacoes_nao_lidas|pluralize }}{% endif %}"
+           {% if pagina_atual == 'notificacoes' %}aria-current="page"{% endif %}>
+            {% include "core/indicador_notificacoes.html" with mostrar_rotulo=True %}
+        </a>
+        <a href="{% url 'configuracoes' %}"
+           class="nav-item{% if pagina_atual == 'configuracoes' %} active{% endif %}"
+           {% if pagina_atual == 'configuracoes' %}aria-current="page"{% endif %}>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <path d="M4 7h5m4 0h7M4 12h9m4 0h3M4 17h3m4 0h9"/>
+                <circle cx="11" cy="7" r="2"/>
+                <circle cx="15" cy="12" r="2"/>
+                <circle cx="9" cy="17" r="2"/>
+            </svg>
+            <span>Configurações</span>
+        </a>
     </nav>
 
 
@@ -52,7 +84,7 @@
     <header class="topbar">
         <div class="breadcrumb">
             UNIFIP <span>/</span>
-            <strong>Agenda de salas</strong>
+            <strong>{{ titulo_pagina }}</strong>
         </div>
 
         <div class="mobile-brand">
@@ -67,6 +99,11 @@
         </div>
 
         <div class="topbar-right">
+            <a class="notificacoes-sino-mobile" href="{% url 'notificacoes' %}"
+               data-link-notificacoes aria-label="Notificações{% if avisos_notificacoes_ativos and notificacoes_nao_lidas %}: {{ notificacoes_nao_lidas }} não lida{{ notificacoes_nao_lidas|pluralize }}{% endif %}"
+               {% if pagina_atual == 'notificacoes' %}aria-current="page"{% endif %}>
+                {% include "core/indicador_notificacoes.html" %}
+            </a>
             <div class="user-info">
                 <div class="avatar">
                     {{ user.email|slice:":1"|upper }}
@@ -75,9 +112,9 @@
                     <strong>{{ user.email }}</strong>
                     <small>
                         {% if user.is_staff %}
-                            Administrador
+                            Administrador · {{ user.get_perfil_display }}
                         {% else %}
-                            Usuário
+                            {{ user.get_perfil_display }}
                         {% endif %}
                     </small>
                 </div>
@@ -95,11 +132,19 @@
     <div id="app-content" class="main-content">
         <div class="page-heading">
             <div>
-                <h1>Agenda de salas</h1>
+                <h1 id="titulo-pagina" tabindex="-1">{{ titulo_pagina }}</h1>
+                {% if pagina_atual == 'reservas' %}
+                    <p>Consulte suas reservas e veja quais podem ser canceladas.</p>
+                {% elif pagina_atual == 'notificacoes' %}
+                    <p>Acompanhe as confirmações e os cancelamentos das suas reservas.</p>
+                {% elif pagina_atual == 'agenda' %}
+                    <p>Confira os horários ocupados antes de reservar.</p>
+                {% endif %}
             </div>
         </div>
 
 
+        {% if pagina_atual == 'agenda' %}
         <section class="room-grid" aria-label="Salas cadastradas">
             {% for sala in salas %}
                 <article class="room-card">
@@ -108,7 +153,23 @@
                             <svg class="icon" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor"
                                  stroke-width="2" aria-hidden="true">
-                                <path d="M4 21h16M6 21V4l11-2v19M17 5h3v16"/>
+                                {% with tipo=sala.tipo|lower %}
+                                    {% if tipo == 'auditório' %}
+                                        <rect x="9" y="2" width="6" height="12" rx="3"/>
+                                        <path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4m-3 0h6"/>
+                                    {% elif tipo == 'estudo em grupo' %}
+                                        <circle cx="9" cy="7" r="3"/>
+                                        <path d="M3 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M16 4a3 3 0 0 1 0 6m2 4a4 4 0 0 1 3 4v2"/>
+                                    {% elif tipo == 'informática' %}
+                                        <rect x="3" y="4" width="18" height="12" rx="2"/>
+                                        <path d="M12 16v4m-4 0h8"/>
+                                    {% elif tipo == 'sala de aula' %}
+                                        <rect x="3" y="4" width="18" height="12" rx="1"/>
+                                        <path d="M8 16l-2 5m10-5 2 5M7 9h6m-6 3h3m6 1h2"/>
+                                    {% else %}
+                                        <path d="M4 21V5l8-3 8 3v16M2 21h20M9 21v-5h6v5M8 7h1M15 7h1M8 11h1M15 11h1"/>
+                                    {% endif %}
+                                {% endwith %}
                             </svg>
                         </div>
 
@@ -122,17 +183,26 @@
 
                     <div class="room-bottom">
                         <span>{{ sala.capacidade }} pessoas</span>
+                        {% if user.perfil == 'aluno' and not sala.permite_reserva_aluno %}
+                            <span class="room-restricao">Só professores</span>
+                        {% endif %}
                     </div>
                 </article>
             {% empty %}
                 <div class="card empty-rooms">
-                    <h2>Nenhuma sala disponível</h2>
-                    <p>Não há salas ativas cadastradas no momento.</p>
+                    {% if tipos_selecionados %}
+                        <h2>Nenhuma sala nos tipos selecionados</h2>
+                        <p>Altere a seleção de tipos de sala e clique em Consultar.</p>
+                    {% else %}
+                        <h2>Nenhuma sala disponível</h2>
+                        <p>Não há salas ativas cadastradas no momento.</p>
+                    {% endif %}
                 </div>
             {% endfor %}
         </section>
 
 
+        <div class="agenda-paineis">
         <section class="card reserva-card" aria-labelledby="reserva-titulo">
             <div class="reserva-heading">
                 <div>
@@ -152,9 +222,9 @@
                     <div class="field">
                         <label for="reserva-sala">Sala</label>
                         <select id="reserva-sala" name="sala_id" required>
-                            <option value="">Selecione uma sala</option>
+                            <option value="">{% if salas_reservaveis %}Selecione uma sala{% else %}Nenhuma sala autorizada nesta consulta{% endif %}</option>
 
-                            {% for sala in salas %}
+                            {% for sala in salas_reservaveis %}
                                 <option value="{{ sala.id }}">
                                     {{ sala.nome }}
                                 </option>
@@ -220,27 +290,11 @@
                     Confirmar reserva
                 </button>
 
-                <p
-                    id="reserva-feedback"
-                    class="reserva-feedback"
-                    role="status"
-                    aria-live="polite"
-                    hidden
-                ></p>
-
-                <a
-                    id="reserva-consultar"
-                    class="reserva-consultar"
-                    href="{% url 'home' %}"
-                    hidden
-                >
-                    Atualizar agenda para visualizar a reserva
-                </a>
             </form>
         </section>
 
 
-        <section class="card calendar-card"
+        <section id="agenda-horarios" class="card calendar-card"
                  aria-label="Agenda de horários">
 
             <div class="calendar-toolbar">
@@ -249,38 +303,43 @@
                 </div>
 
 
-                <form method="get" class="date-control">
-                    <select
-                        name="tipo"
-                        class="date-input"
-                        aria-label="Filtrar por tipo de sala"
-                    >
-                        <option value="">Todos os tipos</option>
+                <form id="agenda-filtros" method="get" class="date-control">
+                    <input type="hidden" name="filtro_tipos" value="1">
+                    <details class="field filtro-tipos" id="filtro-tipos">
+                        <summary><span id="filtro-tipos-resumo">{% if not tipos_selecionados %}Todos os tipos{% elif tipos_selecionados|length == 1 %}{{ tipos_selecionados|first }}{% else %}{{ tipos_selecionados|length }} tipos{% endif %}</span></summary>
+                        <div class="filtro-tipos-painel">
+                            <fieldset class="filtro-tipos-opcoes" id="filtro-tipos-opcoes">
+                                <legend>Tipos de sala</legend>
+                                {% for tipo in tipos_sala %}
+                                    <label>
+                                        <input type="checkbox" name="tipo" value="{{ tipo }}"{% if tipo in tipos_selecionados %} checked{% endif %}>
+                                        <span>{{ tipo }}</span>
+                                    </label>
+                                {% empty %}
+                                    <p>Nenhum tipo de sala disponível.</p>
+                                {% endfor %}
+                                <p>Sem seleção, todos os tipos são exibidos.</p>
+                            </fieldset>
+                        </div>
+                    </details>
 
-                        {% for tipo in tipos_sala %}
-                            <option
-                                value="{{ tipo }}"
-                                {% if tipo == tipo_selecionado %}selected{% endif %}
-                            >
-                                {{ tipo }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                    <div class="field">
+                        <input type="date" name="data"
+                               value="{{ data_agenda|date:'Y-m-d' }}"
+                               aria-label="Data da agenda">
+                    </div>
 
-                    <input
-                        type="date"
-                        name="data"
-                        class="tipo-sala-input"
-                        value="{{ data_agenda|date:'Y-m-d' }}"
-                        aria-label="Data da agenda"
-                    >
-
-                    <button type="submit" class="today-btn">
-                        Consultar
-                    </button>
+                    <div class="filtro-acoes">
+                        <button type="submit" class="btn primary">Consultar</button>
+                        <button type="submit" class="btn" id="agenda-limpar-filtro"
+                                name="limpar_tipos" value="1"{% if not tipos_selecionados %} disabled{% endif %}>
+                            Limpar filtro
+                        </button>
+                    </div>
                 </form>
 
             </div>
+
 
             <div class="calendar-subbar">
                 <div class="date-title">
@@ -324,13 +383,16 @@
                                     <button
                                         type="button"
                                         class="slot slot-readonly slot-occupied slot-details"
+                                        style="--matiz-reserva: {{ intervalo.matiz_reserva|unlocalize }};"
                                         aria-label="Ver reserva da sala {{ item.sala.nome }} às {{ intervalo.hora }}"
                                         data-sala="{{ item.sala.nome }}"
                                         data-data="{{ data_agenda|date:'d/m/Y' }}"
                                         data-inicio="{{ intervalo.reserva.inicio|time:'H:i' }}"
                                         data-fim="{{ intervalo.reserva.fim|time:'H:i' }}"
                                         data-status="Reservada"
+                                        data-responsavel="{{ intervalo.reserva.usuario.get_full_name|default:'Nome não cadastrado' }}"
                                         {% if intervalo.minha_reserva %}
+                                            title="{{ intervalo.reserva.finalidade }}"
                                             data-finalidade="{{ intervalo.reserva.finalidade }}"
                                         {% endif %}
                                     ></button>
@@ -352,52 +414,60 @@
 
 
             <div class="calendar-footer">
-                Horários destacados em laranja já estão reservados.
+                Clique em um horário reservado para ver os detalhes.
             </div>
 
         </section>
+        </div>
 
 
-        <dialog id="reserva-detalhes" aria-labelledby="detalhes-titulo">
-            <h2 id="detalhes-titulo">Detalhes da reserva</h2>
+        <dialog id="reserva-detalhes" class="reserva-dialog" aria-labelledby="detalhes-titulo">
+            <header class="dialog-header">
+                <h2 id="detalhes-titulo" tabindex="-1" autofocus>Detalhes da reserva</h2>
+                <span id="detalhes-status" class="reserva-status reserva-status--confirmada"></span>
+            </header>
 
-            <dl>
-                <dt>Sala</dt>
-                <dd id="detalhes-sala"></dd>
+            <dl class="reserva-detalhes-info">
+                <div class="reserva-detalhes-sala">
+                    <dt>Sala</dt>
+                    <dd id="detalhes-sala" class="reserva-dialog-sala"></dd>
+                </div>
 
-                <dt>Data</dt>
-                <dd id="detalhes-data"></dd>
+                <div class="reserva-detalhes-periodo">
+                    <dt>Data</dt>
+                    <dd id="detalhes-data"></dd>
+                </div>
 
-                <dt>Horário</dt>
-                <dd id="detalhes-horario"></dd>
+                <div class="reserva-detalhes-periodo">
+                    <dt>Horário</dt>
+                    <dd id="detalhes-horario"></dd>
+                </div>
 
-                <dt>Situação</dt>
-                <dd id="detalhes-status"></dd>
-            </dl>
+                <div class="reserva-detalhes-responsavel">
+                    <dt>Responsável</dt>
+                    <dd id="detalhes-responsavel"></dd>
+                </div>
 
-            <div id="detalhes-finalidade-container" hidden>
-                <dl>
+                <div id="detalhes-finalidade-container" hidden>
                     <dt>Finalidade</dt>
                     <dd id="detalhes-finalidade"></dd>
-                </dl>
-            </div>
+                </div>
+            </dl>
 
-            <button type="button" id="fechar-detalhes">
-                Fechar
-            </button>
+            <form method="dialog" class="dialog-actions">
+                <button type="submit" class="btn primary" id="fechar-detalhes">Fechar</button>
+            </form>
         </dialog>
 
 
-        <section class="card minhas-reservas"
-                 aria-labelledby="minhas-reservas-titulo">
-
-            <h2 id="minhas-reservas-titulo">Minhas reservas</h2>
+        {% elif pagina_atual == 'reservas' %}
+        <section class="card minhas-reservas" aria-labelledby="titulo-pagina">
 
             {% if minhas_reservas %}
                 <div class="minhas-reservas-scroll">
-                    <table class="minhas-reservas-tabela">
-                        <thead>
-                            <tr>
+                    <table class="minhas-reservas-tabela" role="table" aria-label="Histórico de reservas">
+                        <thead role="rowgroup">
+                            <tr role="row">
                                 <th scope="col">Sala</th>
                                 <th scope="col">Data</th>
                                 <th scope="col">Início</th>
@@ -407,28 +477,33 @@
                                 <th scope="col">Ações</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody role="rowgroup">
                             {% for reserva in minhas_reservas %}
-                                <tr>
-                                    <td>{{ reserva.sala.nome }}</td>
-                                    <td>{{ reserva.data|date:"d/m/Y" }}</td>
-                                    <td>{{ reserva.inicio|time:"H:i" }}</td>
-                                    <td>{{ reserva.fim|time:"H:i" }}</td>
-                                    <td>{{ reserva.finalidade }}</td>
+                                <tr role="row">
+                                    <td class="reserva-tabela-sala" role="cell">{{ reserva.sala.nome }}</td>
+                                    <td role="cell"><span class="reserva-rotulo" aria-hidden="true">Data</span>{{ reserva.data|date:"d/m/Y" }}</td>
+                                    <td role="cell"><span class="reserva-rotulo" aria-hidden="true">Início</span>{{ reserva.inicio|time:"H:i" }}</td>
+                                    <td role="cell"><span class="reserva-rotulo" aria-hidden="true">Término</span>{{ reserva.fim|time:"H:i" }}</td>
+                                    <td class="reserva-tabela-finalidade" role="cell"><span class="reserva-rotulo" aria-hidden="true">Finalidade</span>{{ reserva.finalidade }}</td>
 
-                                    <td>
-                                        <span class="reserva-status reserva-status--{{ reserva.status }}">
+                                    <td class="reserva-tabela-status" role="cell">
+                                        <span class="reserva-status reserva-status--{{ reserva.status }}"
+                                              role="status">
                                             {{ reserva.get_status_display }}
                                         </span>
                                     </td>
 
 
-                                    <td>
+                                    <td class="reserva-tabela-acoes" role="cell">
                                         {% if reserva.pode_cancelar %}
                                             <button
                                                 type="button"
                                                 class="btn-cancelar-reserva"
                                                 data-reserva-id="{{ reserva.pk }}"
+                                                data-cancelar-url="{% url 'bookings:cancelar_reserva' reserva.pk %}"
+                                                data-sala="{{ reserva.sala.nome }}"
+                                                data-data="{{ reserva.data|date:'d/m/Y' }}"
+                                                data-horario="{{ reserva.inicio|time:'H:i' }} às {{ reserva.fim|time:'H:i' }}"
                                                 aria-label="Cancelar reserva da sala {{ reserva.sala.nome }}"
                                             >
                                                 Cancelar
@@ -443,15 +518,62 @@
                         </tbody>
                     </table>
                 </div>
+                {% include "core/paginacao.html" with pagina=minhas_reservas rotulo="Páginas de reservas" only %}
             {% else %}
-                <p>Você ainda não possui reservas.</p>
+                <div class="reserva-lista-vazia">
+                    <h2>Você ainda não possui reservas.</h2>
+                    <p>Quando você reservar uma sala, ela aparecerá aqui.</p>
+                </div>
             {% endif %}
 
         </section>
 
+        <dialog id="cancelamento-reserva" class="reserva-dialog"
+                aria-labelledby="cancelamento-titulo" aria-describedby="cancelamento-aviso">
+            <header class="dialog-header">
+                <h2 id="cancelamento-titulo">Cancelar reserva?</h2>
+            </header>
+
+            <dl class="reserva-detalhes-info">
+                <div class="reserva-detalhes-sala">
+                    <dt>Sala</dt>
+                    <dd class="reserva-dialog-sala" id="cancelamento-sala"></dd>
+                </div>
+                <div class="reserva-detalhes-periodo">
+                    <dt>Data</dt>
+                    <dd id="cancelamento-data"></dd>
+                </div>
+                <div class="reserva-detalhes-periodo">
+                    <dt>Horário</dt>
+                    <dd id="cancelamento-horario"></dd>
+                </div>
+            </dl>
+
+            <p id="cancelamento-aviso">O horário ficará disponível para outras reservas.</p>
+
+            <form id="cancelamento-form" method="dialog" class="dialog-actions wrap">
+                {% csrf_token %}
+                <button type="button" id="manter-reserva" class="btn" autofocus>Manter reserva</button>
+                <button type="submit" id="confirmar-cancelamento" class="btn danger">Confirmar cancelamento</button>
+            </form>
+        </dialog>
+        {% elif pagina_atual == 'notificacoes' %}
+        {% include "core/notificacoes.html" %}
+        {% elif pagina_atual == 'configuracoes' %}
+        <div class="configuracoes-paineis">
+            {% include "core/minha_conta.html" %}
+            {% include "core/preferencias_agenda.html" %}
+            {% include "core/preferencia_notificacoes.html" %}
+        </div>
+        {% endif %}
+
 
     </div>
 </div>
+<div id="estado-notificacoes" hidden
+   data-url-estado="{% url 'estado_notificacoes' %}" data-usuario="{{ user.pk }}"
+   data-avisos-ativos="{{ avisos_notificacoes_ativos|yesno:'true,false' }}"
+   data-total="{{ notificacoes_nao_lidas|unlocalize }}" data-ultima-id="{{ ultima_notificacao_id|unlocalize }}"></div>
 {% endblock %}
 
 {% block extra_js %}
@@ -482,8 +604,19 @@
     });
 </script>
 
-<script src="{% static 'js/reserva-form.js' %}" defer></script>
-<script src="{% static 'js/cancelar-reserva.js' %}" defer></script>
+<script src="{% static 'js/rolagem-dashboard.js' %}" defer></script>
+<script src="{% static 'js/notificacoes-indicador.js' %}?v=6" defer></script>
+{% if pagina_atual == 'reservas' %}
+<script src="{% static 'js/cancelar-reserva.js' %}?v=3" defer></script>
+{% elif pagina_atual == 'agenda' %}
+<script src="{% static 'js/agenda-filtros.js' %}?v=3" defer></script>
+<script src="{% static 'js/reserva-form.js' %}?v=3" defer></script>
 <script src="{% static 'js/reserva-detalhes.js' %}" defer></script>
+{% elif pagina_atual == 'notificacoes' %}
+<script src="{% static 'js/notificacoes.js' %}?v=6" defer></script>
+{% elif pagina_atual == 'configuracoes' %}
+<script src="{% static 'js/preferencia-notificacoes.js' %}?v=3" defer></script>
+<script src="{% static 'js/preferencias-agenda.js' %}" defer></script>
+{% endif %}
 
 {% endblock %}

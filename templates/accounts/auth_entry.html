@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block framework_css %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth-entry.css' %}?v=4">
+{% endblock %}
+
+{% block main_class %}auth-entry{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+    <div class="auth-brand">
+        <div>
+            <p class="auth-wordmark">Sala<span>Fácil</span>!</p>
+            <p class="auth-campus">UNIFIP · Campus Patos</p>
+        </div>
+
+        <div class="auth-brand-detail">
+            <p>Agende salas e auditórios do seu campus.</p>
+            <div class="auth-calendar" aria-hidden="true">
+                <div class="auth-calendar-colunas">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="auth-calendar-grade">
+                    <div class="auth-calendar-horas"></div>
+                    <div class="auth-calendar-sala"><span class="auth-calendar-reserva auth-calendar-reserva-lab"></span></div>
+                    <div class="auth-calendar-sala"></div>
+                    <div class="auth-calendar-sala"><span class="auth-calendar-reserva auth-calendar-reserva-estudos"></span></div>
+                    <div class="auth-calendar-sala"><span class="auth-calendar-reserva auth-calendar-reserva-multiuso"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="auth-panel" aria-labelledby="auth-title">
+        <div class="auth-content">
+            <header class="auth-header">
+                <h1 id="auth-title">{% block auth_heading %}{% endblock %}</h1>
+                {% block auth_intro %}{% endblock %}
+            </header>
+            {% block auth_form %}{% endblock %}
+            <footer class="auth-switch">{% block auth_switch %}{% endblock %}</footer>
+        </div>
+    </section>
+</div>
+{% endblock %}

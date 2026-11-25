@@ -50,3 +50,23 @@ class Reserva(models.Model):
 
     def __str__(self):
         return f"{self.sala.nome} - {self.data} ({self.inicio} às {self.fim})"
+
+
+class NotificacaoReserva(models.Model):
+    reserva = models.ForeignKey(
+        Reserva,
+        on_delete=models.CASCADE,
+        related_name="notificacoes",
+    )
+    tipo = models.CharField(max_length=10, choices=Reserva.Status.choices)
+    lida = models.BooleanField(default=False)
+    criada_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criada_em", "-pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["reserva", "tipo"],
+                name="notificacao_unica_por_reserva_e_tipo",
+            ),
+        ]

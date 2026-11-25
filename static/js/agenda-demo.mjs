@@ -6,7 +6,6 @@ import {
 
 const app = document.querySelector('#app');
 const dialog = document.querySelector('#details-dialog');
-const toastElement = document.querySelector('#toast');
 const paths = {
   calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18M8 15h2M14 15h2"/>',
   grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
@@ -53,7 +52,6 @@ let form = { roomId: 'lab01', date, start: '10:30', end: '11:30', title: '' };
 let roomFilter = '';
 let statusFilter = 'all';
 let feedback = null;
-let toastTimer;
 
 function readState() {
   try {
@@ -78,11 +76,8 @@ function persist() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   catch { storageWarning = 'Armazenamento indisponível: os dados ficam apenas nesta sessão.'; }
 }
-function toast(message) {
-  clearTimeout(toastTimer);
-  toastElement.textContent = message;
-  toastElement.hidden = false;
-  toastTimer = setTimeout(() => { toastElement.hidden = true; }, 4500);
+function toast(message, type = 'info') {
+  avisosSistema.mostrar(message, type, 'demonstracao');
 }
 function badge(item) {
   return item.status === 'confirmed'
@@ -94,6 +89,10 @@ function errorNotice(message) {
 }
 function render() {
   app.innerHTML = user ? shell() : login();
+  if (user && storageWarning) {
+    toast(storageWarning, 'warning');
+    storageWarning = '';
+  }
   if (user && view === 'agenda') {
     const calendar = document.querySelector('.calendar-scroll');
     if (calendar) calendar.scrollTop = 40;
@@ -108,7 +107,6 @@ function login() {
     </div></section>
     <section class="login-form-panel"><div class="form-content" id="app-content">
       <header class="login-header"><h2>Explore a sua agenda</h2><p>Escolha uma conta de teste para conhecer as telas.</p></header>
-      <div id="login-error" class="login-error"></div>
       <form id="login-form">
         <label for="email">E-mail da conta de demonstração</label>
         <input id="email" name="email" type="email" placeholder="joao@unifip.edu.br" autocomplete="off" required>
@@ -136,7 +134,6 @@ function shell() {
       <div class="mobile-brand"><button class="menu-toggle" data-action="menu" aria-label="Abrir navegação">${icon('menu')}</button><div>Sala<span>Fácil</span>!</div></div>
       <div class="topbar-right"><span class="private-label">${icon('lock')} Prévia local</span><div class="user-info"><div class="avatar">${escape(user.name.split(' ').slice(0,2).map(part=>part[0]).join(''))}</div><div><strong>${escape(user.name)}</strong><small>${user.role === 'admin' ? 'Administrador' : 'Usuário'}</small></div></div><button class="logout" data-action="logout" aria-label="Sair da demonstração">${icon('logout')}<span>Sair</span></button></div>
     </header><div id="app-content" class="main-content" role="region" aria-label="Conteúdo da demonstração"><div class="page-heading"><div><div class="eyebrow">${view === 'admin' ? 'ÁREA ADMINISTRATIVA' : 'AGENDAMENTO DE ESPAÇOS'}</div><h1>${labels[view]}</h1><p>${({agenda:'Encontre um espaço e faça o próximo encontro acontecer.',mine:'Seus próximos encontros, todos em um só lugar.',notifications:'Acompanhe as confirmações e alterações das suas reservas.',admin:'Acompanhe as reservas e mantenha a agenda organizada.'})[view]}</p></div><div class="heading-actions"><button class="btn soft compact" data-action="test-guide">${icon('help')} Roteiro de teste</button>${view !== 'notifications' ? `<button class="btn primary compact" data-action="new-reservation">${icon('plus')} Nova reserva</button>` : ''}</div></div>
-      ${storageWarning ? `<div class="notice error" role="alert">${escape(storageWarning)}</div>` : ''}
       ${view === 'agenda' ? agenda() : view === 'mine' ? reservationList(false) : view === 'admin' ? reservationList(true) : notificationList()}
       <footer class="page-footer"><span>SalaFácil! · Um campus com mais possibilidades.</span><span>Horários de Brasília (UTC−3) · Demonstração</span></footer>
     </div></div>`;
@@ -177,7 +174,7 @@ function reservationForm() {
 function feedbackHtml() {
   if (!feedback) return '';
   if (feedback.type === 'error') return errorNotice(feedback.message);
-  return `<div class="notice success" role="status">${icon('checkCircle')}<div><strong>Reserva confirmada!</strong>${escape(feedback.message)}<br><button type="button" data-action="details" data-id="${escape(feedback.id)}">Ver reserva</button></div></div>`;
+  return `<button type="button" class="btn" data-action="details" data-id="${escape(feedback.id)}">Ver reserva</button>`;
 }
 function reservationList(all) {
   if (all && user.role !== 'admin') return errorNotice('Acesso restrito a administradores.');
@@ -206,7 +203,7 @@ function modalHeader(title) {
 }
 function showDetails(id) {
   const item = state.reservations.find(record => record.id === id);
-  if (!item) return toast('Reserva não encontrada.');
+  if (!item) return toast('Reserva não encontrada.', 'error');
   showDialog(`${modalHeader('Detalhes da reserva')}<div class="dialog-body">${badge(item)}<h3>${roomFor(item.roomId)?.name}</h3><p>${escape(item.title)}</p><dl class="detail-grid"><div><dt>Data</dt><dd>${shortDate(item.date)}</dd></div><div><dt>Horário</dt><dd>${item.start} – ${item.end}</dd></div><div><dt>Responsável</dt><dd>${escape(ownerFor(item.ownerId)?.name)}</dd></div><div><dt>Protocolo</dt><dd>${escape(item.id)}</dd></div></dl>
       ${!canCancel(user,item) && item.status==='confirmed' ? '<div class="notice info">Somente o responsável ou um administrador pode cancelar esta reserva.</div>' : ''}
       ${item.status==='cancelled' ? '<div class="notice info">A reserva foi cancelada e o horário está disponível para novas reservas.</div>' : ''}
@@ -214,7 +211,7 @@ function showDetails(id) {
 }
 function showCancel(id) {
   const item = state.reservations.find(record => record.id === id);
-  if (!item || !canCancel(user,item)) return toast('Você não pode cancelar esta reserva.');
+  if (!item || !canCancel(user,item)) return toast('Você não pode cancelar esta reserva.', 'error');
   showDialog(`${modalHeader('Cancelar esta reserva?')}<div class="dialog-body"><p class="cancel-note">${roomFor(item.roomId).name} · ${shortDate(item.date)} · ${item.start}–${item.end}</p><p style="margin-top:12px">O horário será liberado imediatamente. O responsável receberá uma notificação no sistema.</p><div class="dialog-actions"><button class="btn compact" data-action="details" data-id="${escape(id)}">Manter reserva</button><button class="btn danger compact" data-action="cancel" data-id="${escape(id)}">Confirmar cancelamento</button></div></div>`);
 }
 function showGuide() {
@@ -243,7 +240,6 @@ document.addEventListener('click', event => {
     const account = USERS.find(item => item.id === button.dataset.user);
     document.querySelector('#email').value = account.email;
     document.querySelector('#password').value = DEMO_PASSWORD;
-    document.querySelector('#login-error').innerHTML = '';
     document.querySelector('#login-form button[type="submit"]').focus();
     return;
   }
@@ -257,11 +253,11 @@ document.addEventListener('click', event => {
   if (!user) return;
   if (action === 'logout') {
     user = null; try { sessionStorage.removeItem('salafacil-frontend-preview-session'); } catch {}
-    view = 'agenda'; feedback = null; dialog.close(); toastElement.hidden = true; render(); return;
+    view = 'agenda'; feedback = null; dialog.close(); avisosSistema.remover('demonstracao'); render(); return;
   }
   if (action === 'menu') { document.querySelector('#sidebar').classList.toggle('open'); return; }
   if (action === 'navigate') {
-    if (button.dataset.view === 'admin' && user.role !== 'admin') return toast('Acesso restrito a administradores.');
+    if (button.dataset.view === 'admin' && user.role !== 'admin') return toast('Acesso restrito a administradores.', 'error');
     readForm(); view = button.dataset.view; statusFilter = 'all'; render(); return;
   }
   if (action === 'test-guide') return showGuide();
@@ -286,11 +282,11 @@ document.addEventListener('click', event => {
     toast('Horário preenchido. Confirme a reserva para testar o bloqueio.'); return;
   }
   if (action === 'cancel') {
-    try { refreshState(); cancelReservation(state,user,button.dataset.id); persist(); dialog.close(); feedback=null; render(); toast('Reserva cancelada. O horário foi liberado.'); }
-    catch(error) { toast(error instanceof BookingError?error.message:'Não foi possível cancelar a reserva.'); }
+    try { refreshState(); cancelReservation(state,user,button.dataset.id); persist(); dialog.close(); feedback=null; render(); toast('Reserva cancelada. O horário foi liberado.', 'success'); }
+    catch(error) { toast(error instanceof BookingError?error.message:'Não foi possível cancelar a reserva.', 'error'); }
     return;
   }
-  if (action === 'mark-read') { refreshState(); markNotificationsRead(state,user); persist(); render(); toast('Notificações marcadas como lidas.'); }
+  if (action === 'mark-read') { refreshState(); markNotificationsRead(state,user); persist(); render(); toast('Notificações marcadas como lidas.', 'success'); }
 });
 
 document.addEventListener('submit',event=>{
@@ -302,7 +298,7 @@ document.addEventListener('submit',event=>{
       try { sessionStorage.setItem('salafacil-frontend-preview-session',user.id); } catch {}
       refreshState(); view='agenda'; render(); toast(`Bem-vindo${user.role==='admin'?'':' de volta'}, ${user.name}!`);
     } catch(error) {
-      document.querySelector('#login-error').innerHTML=errorNotice(error.message);
+      toast(error.message, 'error');
       document.querySelector('#password').value=''; document.querySelector('#password').focus();
     }
   }
@@ -310,11 +306,12 @@ document.addEventListener('submit',event=>{
     event.preventDefault(); readForm();
     try {
       refreshState(); const item=reserve(state,user,form); persist(); date=form.date;
-      feedback={type:'success',message:`${roomFor(item.roomId).name} · ${item.start}–${item.end}`,id:item.id};
-      render(); toast('Reserva confirmada imediatamente.');
+      feedback={type:'success',id:item.id};
+      render(); toast('Reserva confirmada imediatamente.', 'success');
     } catch(error) {
       feedback={type:'error',message:error instanceof BookingError?error.message:'Não foi possível confirmar a reserva.'};
       document.querySelector('#booking-feedback').innerHTML=feedbackHtml();
+      toast('Confira os dados da reserva e tente novamente.', 'error');
     }
     document.querySelector('#booking-feedback')?.focus({preventScroll:false});
   }

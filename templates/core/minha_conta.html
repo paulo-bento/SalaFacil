@@ -1,0 +1,22 @@
+<section aria-labelledby="titulo-minha-conta">
+    <h2 id="titulo-minha-conta" class="conta-titulo">Minha conta</h2>
+    <section class="card conta-card" id="dados-pessoais" aria-labelledby="titulo-dados-pessoais">
+        <h3 id="titulo-dados-pessoais">Dados pessoais</h3>
+        <dl class="conta-identificacao">
+            <div>
+                <dt>E-mail de login</dt>
+                <dd>{{ user.email }}</dd>
+            </div>
+            <div>
+                <dt>Perfil acadêmico</dt>
+                <dd>{{ user.get_perfil_display }}</dd>
+            </div>
+        </dl>
+        <form method="post" action="{% url 'configuracoes' %}#dados-pessoais">
+            {% csrf_token %}
+            <input type="hidden" name="acao" value="dados_pessoais">
+            {% include "core/campos_minha_conta.html" with formulario=dados_pessoais only %}
+            <button type="submit" class="btn primary">Salvar dados pessoais</button>
+        </form>
+    </section>
+</section>

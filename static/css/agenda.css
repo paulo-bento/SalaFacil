@@ -1323,20 +1323,6 @@ h3 {
     flex-shrink: 0;
 }
 
-.toast {
-    position: fixed;
-    bottom: 24px;
-    left: calc(50% + 107px);
-    transform: translateX(-50%);
-    background: var(--dark-hover);
-    color: #fff;
-    font-size: 12px;
-    border-radius: 9px;
-    padding: 13px 20px;
-    box-shadow: 0 6px 30px #302f2933;
-    z-index: 50;
-    max-width: calc(100vw - 30px);
-}
 
 [hidden] {
     display: none!important;
@@ -1535,9 +1521,6 @@ dialog::backdrop {
     }
     .calendar-subbar {
         flex-wrap: wrap;
-    }
-    .toast {
-        left: calc(50% + 95px);
     }
 }
 
@@ -1749,11 +1732,6 @@ dialog::backdrop {
     .reserve-panel .field input,.reserve-panel .field select {
         font-size: 12px;
         height: 42px;
-    }
-    .toast {
-        left: 50%;
-        bottom: 16px;
-        width: max-content;
     }
     .page-footer {
         font-size: 8px;

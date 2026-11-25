@@ -12,6 +12,7 @@ class Sala(models.Model):
     )
     recursos = models.CharField(max_length=200, blank=True)
     ativa = models.BooleanField(default=True)
+    permite_reserva_aluno = models.BooleanField("permite reserva por alunos", default=False)
 
     class Meta:
         ordering = ["nome"]

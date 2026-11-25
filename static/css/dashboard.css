@@ -1,9 +1,105 @@
-/* Dashboard real: grade, reservas e ajustes de interface */
+/* Estrutura e superfícies compartilhadas do SalaFácil! */
+
+.dashboard-main {
+    --bg: var(--salafacil-canvas);
+    --border: var(--salafacil-border);
+    --muted: var(--salafacil-muted);
+    --accent-light: var(--salafacil-tint);
+    --shadow: 0 8px 24px #302f2909;
+    font-family: var(--salafacil-font);
+}
+
+.dashboard-main .workspace {
+    background: var(--bg);
+}
+
+.dashboard-main .card,
+.dashboard-main .room-card {
+    background: var(--salafacil-surface);
+    border-radius: 14px;
+}
+
+.dashboard-main .field :is(input, select) {
+    border-color: var(--border);
+    border-radius: 8px;
+}
+
+.dashboard-main .workspace :is(button, a, input, select):focus-visible {
+    outline: 2px solid var(--salafacil-link);
+    outline-offset: 2px;
+}
+
+html:has(.dashboard-main) {
+    scroll-padding-top: 79px;
+}
+
+.dashboard-main .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--salafacil-surface);
+}
+
+.dashboard-main .breadcrumb {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.dashboard-main :is(.topbar-right, .user-info, .user-info > div:last-child) {
+    min-width: 0;
+}
+
+.dashboard-main .avatar {
+    flex-shrink: 0;
+    background: var(--accent-light);
+    color: var(--salafacil-link);
+}
+
+.dashboard-main .user-info strong {
+    max-width: 32ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+.dashboard-main .logout {
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--ink);
+    font-weight: 650;
+}
+
+.dashboard-main .logout:hover {
+    background: var(--bg);
+}
+
+@media (max-width: 760px) {
+    html:has(.dashboard-main) {
+        scroll-padding-top: 65px;
+    }
+}
 
 .dashboard-main .calendar-scroll .calendar-head,
 .dashboard-main .calendar-scroll .timeline {
-    grid-template-columns:
-        53px repeat(var(--room-count), minmax(115px, 1fr));
+    grid-template-columns: 56px repeat(var(--room-count), minmax(115px, 1fr));
+    min-width: calc(56px + var(--room-count) * 115px);
+}
+
+.dashboard-main .calendar-head,
+.dashboard-main .time-axis {
+    background: var(--bg);
+}
+
+.dashboard-main .calendar-head > div,
+.dashboard-main .time-label {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.dashboard-main .calendar-scroll {
+    scrollbar-color: #bdb2a6 transparent;
 }
 
 .dashboard-main .slot-readonly {
@@ -21,16 +117,25 @@
 
 .dashboard-main .slot-readonly.slot-occupied,
 .dashboard-main .slot-readonly.slot-occupied:hover {
-    background: rgb(255 90 36 / 22%);
-    border-left: 3px solid #ff5a24;
-    cursor: default;
+    background: hsl(var(--matiz-reserva) 74% 79%);
+    border-left: 3px solid hsl(var(--matiz-reserva) 72% 40%);
+    cursor: pointer;
 }
 
 
 /* Formulário de reservas reais */
 
+.dashboard-main .agenda-paineis {
+    display: grid;
+    gap: 20px;
+    align-items: start;
+}
+
+.dashboard-main .agenda-paineis > section {
+    min-width: 0;
+}
+
 .dashboard-main .reserva-card {
-    margin-bottom: 24px;
     padding: 20px;
 }
 
@@ -39,14 +144,14 @@
 }
 
 .dashboard-main .reserva-heading h2 {
-    font-size: 17px;
+    font-size: 18px;
     color: var(--ink);
 }
 
 .dashboard-main .reserva-heading p {
     margin-top: 5px;
     color: var(--muted);
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .dashboard-main .reserva-card .field input,
@@ -58,30 +163,106 @@
     margin-top: 4px;
 }
 
-.dashboard-main .reserva-feedback {
-    margin-top: 14px;
+.reserva-erro-campo {
     font-size: 13px;
-    font-weight: 600;
-}
-
-.dashboard-main .reserva-feedback[data-status="success"] {
-    color: #23663b;
-}
-
-.dashboard-main .reserva-feedback[data-status="error"] {
     color: #a52a20;
 }
 
-.dashboard-main .reserva-consultar {
-    display: inline-block;
-    margin-top: 10px;
-    font-size: 12px;
-    font-weight: 600;
+.conta-titulo {
+    margin: 0 0 12px;
+    font-size: 18px;
 }
 
-.dashboard-main .reserva-consultar[hidden],
-.dashboard-main .reserva-feedback[hidden] {
-    display: none;
+.configuracoes-paineis {
+    display: grid;
+    gap: 16px;
+    max-width: 760px;
+}
+
+.conta-card {
+    padding: 20px;
+}
+
+.conta-card :is(h2, h3) {
+    margin: 0 0 16px;
+    font-size: 16px;
+}
+
+.conta-identificacao {
+    display: grid;
+    gap: 10px;
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+}
+
+.conta-identificacao dt {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.conta-identificacao dd {
+    margin: 2px 0 0;
+    overflow-wrap: anywhere;
+    user-select: text;
+    cursor: text;
+}
+
+.conta-card :is(.hint ul, .errorlist) {
+    margin: 0;
+    padding-inline-start: 18px;
+    font-size: 13px;
+}
+
+.conta-card .errorlist {
+    color: #a52a20;
+}
+
+.preferencias-agenda-tipos {
+    min-inline-size: 0;
+    margin: 0 0 16px;
+    padding: 0;
+    border: 0;
+    font-size: 13px;
+}
+
+.preferencias-agenda-tipos legend {
+    font-weight: 650;
+}
+
+.preferencias-agenda-tipos p {
+    margin: 4px 0 12px;
+    color: var(--muted);
+}
+
+.preferencias-agenda-tipos label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+}
+
+.preferencias-agenda-tipos input {
+    accent-color: var(--salafacil-link);
+}
+
+@media (min-width: 1350px) {
+    .dashboard-main .agenda-paineis {
+        grid-template-columns: minmax(290px, 320px) minmax(0, 1fr);
+    }
+
+    .dashboard-main .reserva-card .form-row:first-of-type {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .dashboard-main #reserva-submit {
+        width: 100%;
+    }
 }
 
 @media (max-width: 600px) {
@@ -100,32 +281,79 @@
     border-color: var(--border);
 }
 
+.dashboard-main .room-top {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.dashboard-main .room-card .room-icon {
+    background: var(--accent-light);
+    color: var(--salafacil-link);
+}
+
 .dashboard-main .room-card h3 {
     white-space: normal;
     overflow: visible;
     font-size: 15px;
+    overflow-wrap: anywhere;
 }
 
 .dashboard-main .room-card p {
     display: block;
+    color: var(--muted);
     font-size: 12px;
 }
 
-.dashboard-main .room-type {
+.dashboard-main .room-card .room-type {
     display: inline;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--muted);
     font-size: 11px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
 }
 
 .dashboard-main .room-bottom {
-    font-size: 11px;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.dashboard-main .room-bottom > span {
+    white-space: nowrap;
+}
+
+.dashboard-main .room-restricao {
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--accent-light);
+    color: var(--salafacil-link);
+    font-size: .92em;
+    font-weight: 650;
 }
 
 .dashboard-main .page-heading {
-    margin-bottom: 18px;
+    margin-bottom: 22px;
+}
+
+.dashboard-main .page-heading h1 {
+    font-size: clamp(1.55rem, 3vw, 2rem);
+    letter-spacing: -.035em;
+    line-height: 1.2;
+}
+
+.dashboard-main .page-heading p {
+    margin-top: 6px;
+    font-size: 13px;
 }
 
 .dashboard-main .calendar-toolbar h2 {
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .dashboard-main .calendar-head > div,
@@ -133,19 +361,33 @@
     font-size: 11px;
 }
 
-.dashboard-main .today-btn,
-.dashboard-main .date-input {
-    height: 34px;
+.dashboard-main .calendar-footer {
+    padding: 12px 20px;
+    background: var(--bg);
+    color: var(--muted);
     font-size: 12px;
 }
 
-.dashboard-main .logout,
-.dashboard-main .calendar-footer {
+.dashboard-main .date-title {
+    color: var(--muted);
     font-size: 12px;
+    font-weight: 600;
+    text-transform: none;
 }
 
 .dashboard-main .empty-rooms {
     padding: 24px;
+    grid-column: 1 / -1;
+}
+
+.dashboard-main .empty-rooms h2,
+.dashboard-main .reserva-lista-vazia h2 {
+    font-size: 16px;
+}
+
+.dashboard-main :is(.empty-rooms, .reserva-lista-vazia) p {
+    margin: 4px 0 0;
+    color: var(--muted);
 }
 
 @media (max-width: 600px) {
@@ -167,7 +409,7 @@
         font-size: 10px;
     }
 
-    .dashboard-main .room-type {
+    .dashboard-main .room-card .room-type {
         font-size: 10px;
     }
 
@@ -186,7 +428,7 @@
 /* Barra lateral do dashboard */
 
 .dashboard-main .sidebar {
-    background: linear-gradient(180deg, #302f29, #292823);
+    background: var(--salafacil-dark);
     border-right: 1px solid rgb(255 255 255 / 8%);
 }
 
@@ -202,10 +444,6 @@
     font-weight: 750;
     line-height: 1.2;
     letter-spacing: -0.8px;
-}
-
-.dashboard-main .brand-name span {
-    color: #ff5a24;
 }
 
 .dashboard-main .brand-caption {
@@ -242,8 +480,8 @@
 }
 
 .dashboard-main .sidebar .nav-item.active {
-    background: rgb(255 255 255 / 12%);
-    border-color: rgb(255 255 255 / 6%);
+    background: #ff5a241e;
+    border-color: #ff5a243b;
     color: #fff;
 }
 
@@ -253,7 +491,7 @@
     bottom: 9px;
     width: 3px;
     border-radius: 3px;
-    background: #ff5a24;
+    background: var(--salafacil-primary);
 }
 
 .dashboard-main .sidebar .nav-item .icon {
@@ -280,14 +518,7 @@
 /* Minhas reservas */
 
 .minhas-reservas {
-    margin-top: 24px;
-    padding: 24px;
-}
-
-.minhas-reservas h2 {
-    margin: 0 0 20px;
-    font-size: 18px;
-    font-weight: 700;
+    padding: 0;
 }
 
 .minhas-reservas-scroll {
@@ -300,7 +531,7 @@
     min-width: 720px;
     margin: 0;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .minhas-reservas-tabela th,
@@ -308,23 +539,19 @@
     padding: 14px 16px;
     text-align: left;
     vertical-align: middle;
-    border-bottom: 1px solid #ebe7e2;
+    border-bottom: 1px solid var(--border);
 }
 
 .minhas-reservas-tabela th {
-    background: #f8f7f5;
-    color: #697386;
+    background: var(--bg);
+    color: var(--muted);
     font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
 }
 
-.minhas-reservas-tabela td {
-    color: #34332f;
-}
-
 .minhas-reservas-tabela tbody tr:hover {
-    background: #faf9f7;
+    background: #f9f5f0;
 }
 
 .minhas-reservas-tabela tbody tr:last-child td {
@@ -333,38 +560,117 @@
 
 .minhas-reservas-tabela td:nth-child(2),
 .minhas-reservas-tabela td:nth-child(3),
-.minhas-reservas-tabela td:nth-child(4),
-.minhas-reservas-tabela td:last-child {
+.minhas-reservas-tabela td:nth-child(4) {
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
 
-@media (max-width: 768px) {
-    .minhas-reservas {
-        padding: 16px;
+.reserva-tabela-sala {
+    font-weight: 700;
+}
+
+.reserva-tabela-finalidade {
+    overflow-wrap: anywhere;
+}
+
+.reserva-lista-vazia {
+    padding: 24px;
+}
+
+.reserva-rotulo {
+    display: none;
+}
+
+.minhas-reservas-tabela :is(th, td):last-child {
+    text-align: center;
+}
+
+@media (max-width: 960px) {
+    .dashboard-main .minhas-reservas:has(.minhas-reservas-tabela) {
+        background: transparent;
+        border: 0;
+        box-shadow: none;
     }
 
-    .minhas-reservas h2 {
-        font-size: 16px;
+    .minhas-reservas-tabela {
+        display: block;
+        min-width: 0;
+    }
+
+    .minhas-reservas-tabela thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+    }
+
+    .minhas-reservas-tabela tbody {
+        display: grid;
+        gap: 12px;
+    }
+
+    .minhas-reservas-tabela tbody tr,
+    .minhas-reservas-tabela tbody tr:hover {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(88px, 1fr);
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--salafacil-surface);
+    }
+
+    .minhas-reservas-tabela td {
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        font-size: 13px;
+    }
+
+    .minhas-reservas-tabela .reserva-tabela-sala {
+        grid-column: 1 / 3;
+        align-self: center;
+        font-size: 15px;
+        overflow-wrap: anywhere;
+    }
+
+    .reserva-tabela-status {
+        grid-column: 3;
+        grid-row: 1;
+        justify-self: end;
+    }
+
+    .reserva-tabela-finalidade,
+    .reserva-tabela-acoes {
+        grid-column: 1 / -1;
+    }
+
+    .minhas-reservas-tabela td.reserva-tabela-acoes {
+        text-align: right;
+    }
+
+    .reserva-tabela-acoes:not(:has(.btn-cancelar-reserva)) {
+        display: none;
+    }
+
+    .reserva-rotulo {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 650;
     }
 }
 
 
 
 /* Ações das reservas */
-
-.minhas-reservas-tabela td:last-child {
-    text-align: center;
-}
-
-.minhas-reservas-tabela th:last-child {
-    text-align: center;
-}
-
 .btn-cancelar-reserva {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 34px;
+    min-height: 38px;
     padding: 7px 14px;
     margin: 0;
 
@@ -410,7 +716,7 @@
     display: inline-flex;
     align-items: center;
     padding: 5px 10px;
-    border-radius: 6px;
+    border-radius: 999px;
     font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
@@ -422,57 +728,376 @@
 }
 
 .reserva-status--cancelada {
-    background: #f2f1ef;
-    color: #77736c;
+    background: var(--bg);
+    color: var(--muted);
+}
+
+/* Notificações de reservas */
+
+.notificacoes-contador {
+    display: inline-grid;
+    place-items: center;
+    min-width: 20px;
+    min-height: 20px;
+    margin-inline-start: auto;
+    padding-inline: 4px;
+    border-radius: 999px;
+    background: var(--accent-light);
+    color: var(--salafacil-link);
+    font-size: 11px;
+    font-weight: 750;
+    line-height: 1;
+}
+
+.notificacoes-contador[hidden] {
+    display: none;
+}
+
+.notificacoes-sino-mobile {
+    display: none;
+}
+
+@media (max-width: 760px) {
+    .notificacoes-sino-mobile {
+        position: relative;
+        display: inline-grid;
+        flex-shrink: 0;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--salafacil-link);
+    }
+
+    .notificacoes-sino-mobile .notificacoes-contador {
+        position: absolute;
+        inset-block-start: -6px;
+        inset-inline-end: -5px;
+        outline: 1px solid var(--salafacil-surface);
+    }
+}
+
+.notificacoes-preferencia {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 20px;
+    margin-bottom: 16px;
+    padding: 16px 20px;
+}
+
+.notificacoes-preferencia h2 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.notificacoes-preferencia p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.notificacoes-interruptor {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.notificacoes-interruptor-trilho {
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 32px;
+    height: 18px;
+    padding: 3px;
+    border-radius: 10px;
+    background: var(--muted);
+}
+
+.notificacoes-interruptor-trilho::after {
+    content: "";
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.notificacoes-interruptor[aria-checked="true"] .notificacoes-interruptor-trilho {
+    justify-content: flex-end;
+    background: var(--salafacil-dark);
+}
+
+.notificacoes-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.notificacoes-acoes p {
+    margin: 0;
+    font-size: 13px;
+}
+
+.notificacoes-lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.notificacao {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    padding: 18px 20px;
+    border-inline-start: 3px solid transparent;
+    border-bottom: 1px solid var(--border);
+}
+
+.notificacao:last-child {
+    border-bottom: 0;
+}
+
+.notificacao-nova {
+    border-inline-start-color: var(--orange);
+    background: #fcf3ed;
+}
+
+.notificacao-conteudo {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.notificacao-cabecalho,
+.paginacao {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+}
+
+.notificacao-cabecalho h2 {
+    font-size: 16px;
+}
+
+.notificacao-leitura {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.notificacao-nova .notificacao-leitura {
+    background: var(--accent-light);
+    color: var(--salafacil-link);
+}
+
+.notificacao-reserva {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    margin: 6px 0 3px;
+}
+
+.notificacao-data,
+.paginacao {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.paginacao {
+    justify-content: center;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+}
+
+.paginacao a {
+    color: var(--ink);
+    text-decoration: none;
 }
 
 
 
-/* RF08 — Filtro por tipo de sala */
+/* Controles da agenda do dia */
+
+.dashboard-main .calendar-toolbar,
+.dashboard-main .calendar-subbar {
+    padding-inline: 20px;
+}
 
 .dashboard-main .calendar-toolbar {
+    flex-wrap: wrap;
     gap: 16px;
 }
 
+.dashboard-main .calendar-card {
+    overflow: visible;
+}
+
+.dashboard-main .calendar-footer {
+    border-radius: 0 0 13px 13px;
+}
+
 .dashboard-main .date-control {
+    flex-wrap: wrap;
+    gap: 8px;
+    width: min(100%, 520px);
+}
+
+.dashboard-main .date-control .field {
+    flex: 1 1 140px;
+    min-width: 0;
+    margin: 0;
+}
+
+.dashboard-main .filtro-tipos {
+    display: block;
+    position: relative;
+}
+
+.filtro-tipos summary {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 43px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.filtro-tipos summary::-webkit-details-marker {
+    display: none;
+}
+
+.filtro-tipos summary::after {
+    content: "";
+    flex: 0 0 6px;
+    height: 6px;
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    transform: rotate(45deg);
+}
+
+.filtro-tipos[open] summary::after {
+    transform: rotate(225deg);
+}
+
+.filtro-tipos[open] summary {
+    border-color: var(--salafacil-link);
+}
+
+.filtro-tipos summary:focus-visible {
+    outline: 2px solid var(--salafacil-link);
+    outline-offset: 2px;
+}
+
+.filtro-tipos summary span {
+    overflow-wrap: anywhere;
+}
+
+.filtro-tipos-painel {
+    position: absolute;
+    z-index: 5;
+    inset-block-start: calc(100% + 6px);
+    inset-inline-start: 0;
+    width: 248px;
+    max-height: min(19rem, 50vh);
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--salafacil-surface);
+    box-shadow: 0 10px 24px #302f2926;
+}
+
+.filtro-tipos-opcoes {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.filtro-tipos-opcoes legend {
+    padding: 0 8px 4px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.filtro-tipos-opcoes p {
+    margin: 6px 8px 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.filtro-tipos-opcoes label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+}
+
+.filtro-tipos-opcoes label:hover,
+.filtro-tipos-opcoes label:focus-within {
+    background: var(--bg);
+}
+
+.dashboard-main .filtro-tipos-opcoes input[type="checkbox"] {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    accent-color: var(--dark);
+}
+
+.dashboard-main .filtro-acoes {
+    display: flex;
     flex-wrap: wrap;
     gap: 8px;
 }
 
-.dashboard-main .tipo-sala-input {
-    width: 180px;
-    min-width: 0;
-    height: 36px;
-    margin: 0;
-    padding: 0 30px 0 12px;
-    border: 1px solid #e8e4df;
-    border-radius: 7px;
-    background-color: #fff;
-    color: #34332f;
-    font-family: inherit;
-    font-size: 12px;
-    cursor: pointer;
-}
-
-.dashboard-main .tipo-sala-input:focus-visible {
-    outline: 2px solid #ff5a24;
-    outline-offset: 2px;
+.dashboard-main .filtro-acoes .btn,
+.dashboard-main .reserva-card .btn.primary {
+    min-height: 43px;
+    padding-block: 0;
 }
 
 @media (max-width: 768px) {
-    .dashboard-main .calendar-toolbar {
-        align-items: stretch;
-    }
-
     .dashboard-main .date-control {
+        position: relative;
         width: 100%;
     }
 
-    .dashboard-main .tipo-sala-input {
-        flex: 1 1 160px;
-        width: auto;
+    .dashboard-main .date-control .filtro-tipos {
+        position: static;
+    }
+
+    .filtro-tipos-painel {
+        max-width: 100%;
+    }
+
+    .dashboard-main .filtro-acoes {
+        flex: 1 0 auto;
+    }
+
+    .dashboard-main .filtro-acoes .btn {
+        flex-grow: 1;
     }
 }
 
@@ -480,100 +1105,105 @@
 
 /* RF07 — Detalhes da reserva */
 
-.dashboard-main #reserva-detalhes {
-    width: min(420px, calc(100% - 32px));
+.dashboard-main .reserva-dialog {
+    width: min(460px, calc(100% - 32px));
     max-height: calc(100dvh - 32px);
     margin: auto;
-    padding: 28px;
+    padding: clamp(16px, 5vw, 26px);
     overflow-y: auto;
-
-    background: #fff;
-    border: 1px solid #e8e4df;
-    border-radius: 14px;
-    box-shadow: 0 20px 60px rgb(0 0 0 / 18%);
-
-    color: #34332f;
+    background: var(--salafacil-surface);
 }
 
-.dashboard-main #reserva-detalhes::backdrop {
-    background: rgb(25 24 22 / 55%);
+.dashboard-main .reserva-dialog::backdrop {
+    background: rgb(48 47 41 / 46%);
+    backdrop-filter: blur(2px);
 }
 
-.dashboard-main #detalhes-titulo {
-    margin: 0 0 24px;
-    color: #302f29;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.4px;
+.dashboard-main .reserva-dialog .dialog-header {
+    flex-wrap: wrap;
+    margin-bottom: 18px;
 }
 
-.dashboard-main #reserva-detalhes dl {
+.dashboard-main .reserva-dialog .dialog-header h2 {
+    margin: 0;
+    line-height: 1.25;
+}
+
+.dashboard-main #detalhes-titulo:focus {
+    outline: none;
+}
+
+.dashboard-main .reserva-detalhes-info {
     display: grid;
-    grid-template-columns: 90px minmax(0, 1fr);
-    gap: 14px 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
     margin: 0;
 }
 
-.dashboard-main #reserva-detalhes dt {
-    color: #77736c;
-    font-size: 13px;
-    font-weight: 500;
+.dashboard-main .reserva-detalhes-info dt {
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
 }
 
-.dashboard-main #reserva-detalhes dd {
-    min-width: 0;
+.dashboard-main .reserva-detalhes-info dd {
     margin: 0;
-    color: #34332f;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     overflow-wrap: anywhere;
 }
 
+.dashboard-main .reserva-detalhes-sala,
+.dashboard-main .reserva-detalhes-responsavel,
 .dashboard-main #detalhes-finalidade-container {
-    margin-top: 14px;
+    grid-column: 1 / -1;
 }
 
-.dashboard-main #detalhes-finalidade-container[hidden] {
-    display: none;
+.dashboard-main .reserva-detalhes-info .reserva-dialog-sala {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.dashboard-main .reserva-detalhes-periodo {
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-variant-numeric: tabular-nums;
+}
+
+.dashboard-main #detalhes-finalidade-container {
+    padding: 10px 12px;
+    background: var(--accent-light);
+    border-radius: 8px;
+}
+
+.dashboard-main #detalhes-finalidade {
+    font-weight: 500;
+}
+
+.dashboard-main .reserva-dialog .dialog-actions {
+    margin-top: 18px;
+    padding-top: 16px;
 }
 
 .dashboard-main #fechar-detalhes {
-    display: block;
-    width: 100%;
-    min-height: 42px;
-    margin: 28px 0 0;
-    padding: 10px 16px;
+    min-width: 104px;
+}
 
-    background: #ff5a24;
-    border: 1px solid #ff5a24;
-    border-radius: 9px;
-
-    color: #fff;
-    font-family: inherit;
+.dashboard-main .reserva-dialog .dialog-actions .btn {
     font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
 }
 
-.dashboard-main #fechar-detalhes:hover {
-    background: #e84c19;
-    border-color: #e84c19;
+.dashboard-main #cancelamento-aviso {
+    margin: 14px 0 0;
+    color: var(--muted);
 }
 
-.dashboard-main #fechar-detalhes:focus-visible {
-    outline: 2px solid #ff5a24;
-    outline-offset: 3px;
-}
-
-@media (max-width: 480px) {
-    .dashboard-main #reserva-detalhes {
-        padding: 20px;
-    }
-
-    .dashboard-main #reserva-detalhes dl {
-        grid-template-columns: 76px minmax(0, 1fr);
-        gap: 12px 8px;
-    }
+.dashboard-main #confirmar-cancelamento:enabled:hover {
+    filter: brightness(.9);
 }
 
 

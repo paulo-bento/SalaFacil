@@ -10,7 +10,8 @@ class SalaAdmin(admin.ModelAdmin):
         "tipo",
         "localizacao",
         "capacidade",
+        "permite_reserva_aluno",
         "ativa",
     )
-    list_filter = ("ativa", "tipo")
+    list_filter = ("ativa", "tipo", "permite_reserva_aluno")
     search_fields = ("nome", "localizacao")

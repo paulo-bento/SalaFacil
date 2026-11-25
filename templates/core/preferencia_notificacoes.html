@@ -1,0 +1,17 @@
+<section class="card notificacoes-preferencia" aria-labelledby="notificacoes-preferencia-titulo">
+    <div>
+        <h2 id="notificacoes-preferencia-titulo">Avisos de reservas</h2>
+        <p id="notificacoes-preferencia-ajuda">Ao desativar, os avisos na tela e o contador ficam ocultos. As confirmações e os cancelamentos continuam disponíveis em Notificações.</p>
+    </div>
+    <form method="post" action="{% url 'preferencia_notificacoes' %}" id="notificacoes-preferencia-form">
+        {% csrf_token %}
+        <button type="submit" role="switch" class="btn notificacoes-interruptor"
+                aria-labelledby="notificacoes-preferencia-titulo"
+                aria-describedby="notificacoes-preferencia-ajuda"
+                aria-checked="{{ avisos_notificacoes_ativos|yesno:'true,false' }}"
+                name="receber" value="{{ avisos_notificacoes_ativos|yesno:'0,1' }}">
+            <span class="notificacoes-interruptor-trilho" aria-hidden="true"></span>
+            <span data-preferencia-rotulo aria-hidden="true">{{ avisos_notificacoes_ativos|yesno:"Ativados,Desativados" }}</span>
+        </button>
+    </form>
+</section>

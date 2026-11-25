@@ -1,0 +1,82 @@
+.avisos-sistema {
+    position: fixed;
+    z-index: 2000;
+    inset: auto max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) auto;
+    width: min(390px, calc(100% - 32px));
+    pointer-events: none;
+    font-family: var(--salafacil-font, system-ui, sans-serif);
+    text-align: start;
+}
+
+.aviso-sistema {
+    --cor-aviso: var(--salafacil-link, #a33817);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 8px 0 0;
+    padding: 10px 12px 10px 14px;
+    border: 1px solid var(--salafacil-border, #e1dad1);
+    border-inline-start: 4px solid var(--cor-aviso);
+    border-radius: 10px;
+    background: var(--salafacil-surface, #fffdfb);
+    color: var(--salafacil-dark, #302f29);
+    box-shadow: 0 8px 28px rgb(48 47 41 / 18%);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    pointer-events: auto;
+}
+
+.aviso-sistema[hidden] {
+    display: none;
+}
+
+.aviso-sistema:is([data-tipo="success"], [data-aviso-inicial="success"]) {
+    --cor-aviso: #23663b;
+}
+
+.aviso-sistema:is([data-tipo="error"], [data-aviso-inicial="error"]) {
+    --cor-aviso: #a52a20;
+}
+
+.aviso-sistema p {
+    margin: 0;
+    color: inherit;
+    font: inherit;
+}
+
+.aviso-sistema .aviso-fechar {
+    flex: 0 0 36px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    font: 22px/1 system-ui, sans-serif;
+    cursor: pointer;
+}
+
+.aviso-sistema .aviso-fechar:hover {
+    background: var(--salafacil-canvas, #f6f3ef);
+}
+
+.aviso-sistema .aviso-fechar:focus-visible {
+    outline: 2px solid var(--salafacil-link, #a33817);
+    outline-offset: 2px;
+}
+
+.aviso-leitor {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}

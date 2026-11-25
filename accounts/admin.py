@@ -8,12 +8,13 @@ from .models import User
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     ordering = ("email",)
-    list_display = ("email", "first_name", "last_name", "is_staff")
+    list_display = ("email", "first_name", "last_name", "perfil", "is_staff")
+    list_filter = (*UserAdmin.list_filter, "perfil")
 
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         ("Informações pessoais", {
-            "fields": ("first_name", "last_name"),
+            "fields": ("first_name", "last_name", "perfil"),
         }),
         ("Permissões", {
             "fields": (
@@ -34,6 +35,7 @@ class CustomUserAdmin(UserAdmin):
             "classes": ("wide",),
             "fields": (
                 "email",
+                "perfil",
                 "usable_password",
                 "password1",
                 "password2",

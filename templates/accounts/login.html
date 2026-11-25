@@ -1,88 +1,40 @@
-
-{% extends "base.html" %}
-{% load static %}
+{% extends "accounts/auth_entry.html" %}
 
 {% block title %}Entrar | SalaFácil!{% endblock %}
+{% block auth_heading %}Entrar na sua conta{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% block auth_form %}
+<form method="post" class="auth-form">
+    {% csrf_token %}
+
+    <div class="auth-field">
+        <label for="email">E-mail institucional</label>
+        <input type="email" id="email" name="email" value="{{ email|default:'' }}"
+               placeholder="seu.email@instituicao.edu.br" autocomplete="username" required>
+    </div>
+
+    <div class="auth-field">
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
+    </div>
+
+    <fieldset class="auth-perfis">
+        <legend>Perfil acadêmico</legend>
+        <div class="auth-perfis-opcoes">
+            {% for valor, rotulo in perfis %}
+                <label>
+                    <input type="radio" name="perfil" value="{{ valor }}"{% if valor == perfil_selecionado %} checked{% endif %} required>
+                    <span>{{ rotulo }}</span>
+                </label>
+            {% endfor %}
+        </div>
+    </fieldset>
+
+    <a href="{% url 'password_reset' %}" class="auth-recovery">Esqueci minha senha</a>
+    <button type="submit" class="auth-submit">Entrar</button>
+</form>
 {% endblock %}
 
-{% block main_class %}login-main{% endblock %}
-
-{% block content %}
-<section class="login-shell">
-    <div class="login-layout">
-        <section class="login-brand-panel">
-            <div class="brand-content">
-                <h1 class="brand-title">
-                    Sala<span>Fácil</span>!
-                </h1>
-
-                <p class="brand-description">
-                    Agende salas e auditórios de forma simples, fácil e eficiente.
-                </p>
-            </div>
-        </section>
-
-        <section class="login-form-panel">
-            <div class="form-content">
-                <header class="login-header">
-                    <h2>Entrar na sua conta</h2>
-                    <p>Informe suas credenciais para acessar o sistema.</p>
-                </header>
-
-                <form method="post">
-                    {% csrf_token %}
-
-                    {% if error %}
-                        <p role="alert">{{ error }}</p>
-                    {% endif %}
-
-                    <label for="email">E-mail institucional</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value="{{ email|default:'' }}"
-                        placeholder="seu.email@instituicao.edu.br"
-                        autocomplete="username"
-                        required
-                    >
-
-                    <label for="password">Senha</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Digite sua senha"
-                        autocomplete="current-password"
-                        required
-                    >
-
-                    <a href="{% url 'password_reset' %}" class="password-reset-link">
-                        Esqueci minha senha
-                    </a>
-
-                    <button type="submit" class="login-submit-button">
-                        Entrar
-                    </button>
-
-
-                </form>
-
-                <div class="login-divider">
-                    <span>ou</span>
-                </div>
-
-                <div class="login-actions">
-                    <a href="{% url 'register' %}" class="secondary-action">
-                        Criar nova conta
-                    </a>
-
-                </div>
-            </div>
-        </section>
-    </div>
-</section>
+{% block auth_switch %}
+    <span>Ainda não tem conta?</span> <a href="{% url 'register' %}">Criar conta</a>
 {% endblock %}

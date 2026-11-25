@@ -2,6 +2,41 @@
     --salafacil-primary: #ff5a24;
     --salafacil-primary-hover: #d84315;
     --salafacil-dark: #302f29;
+    --salafacil-dark-hover: #24231f;
+    --salafacil-canvas: #f6f3ef;
+    --salafacil-surface: #fffdfb;
+    --salafacil-border: #e1dad1;
+    --salafacil-muted: #68635c;
+    --salafacil-link: #a33817;
+    --salafacil-tint: #fbede8;
+    --salafacil-font: Inter, system-ui, sans-serif;
+}
+
+/* Texto de leitura mantém o cursor padrão e continua selecionável. */
+body {
+    cursor: default;
+}
+
+:any-link,
+summary,
+button:enabled,
+select:enabled,
+input:is([type="button"], [type="submit"], [type="reset"], [type="checkbox"], [type="radio"]):enabled,
+label:has(input:is([type="checkbox"], [type="radio"]):enabled) {
+    cursor: pointer;
+}
+
+textarea:enabled,
+input:not([type]):enabled,
+input:is([type="text"], [type="search"], [type="email"], [type="password"], [type="url"], [type="tel"], [type="number"]):enabled,
+[contenteditable=""],
+[contenteditable="true"],
+[contenteditable="plaintext-only"] {
+    cursor: text;
+}
+
+:is(button, input, select, textarea):disabled {
+    cursor: not-allowed;
 }
 
 :root:not([data-theme="dark"]),

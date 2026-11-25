@@ -13,7 +13,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     {% endblock %}
 
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/avisos.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -21,6 +22,8 @@
         {% block content %}{% endblock %}
     </main>
 
+    {% include "avisos_sistema.html" %}
+    <script src="{% static 'js/avisos.js' %}" defer></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

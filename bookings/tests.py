@@ -1,17 +1,19 @@
 from datetime import time, timedelta
 
 import json
+from unittest.mock import patch
 
 from django.urls import reverse
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
 
 from rooms.models import Sala
 
-from .models import Reserva
+from .models import NotificacaoReserva, Reserva
 from .services import criar_reserva
 from .services import cancelar_reserva
 
@@ -30,6 +32,7 @@ class ReservaServiceTests(TestCase):
             tipo="Informática",
             localizacao="Bloco A",
             capacidade=30,
+            permite_reserva_aluno=True,
         )
 
         cls.outra_sala = Sala.objects.create(
@@ -38,6 +41,7 @@ class ReservaServiceTests(TestCase):
             tipo="Sala de aula",
             localizacao="Bloco B",
             capacidade=20,
+            permite_reserva_aluno=True,
         )
 
     def setUp(self):
@@ -65,6 +69,18 @@ class ReservaServiceTests(TestCase):
         )
         self.assertEqual(Reserva.objects.count(), 1)
 
+    def test_professor_reserva_sala_restrita_mas_nao_sala_inativa(self):
+        self.usuario.perfil = "professor"
+        self.usuario.save(update_fields=["perfil"])
+        self.sala.permite_reserva_aluno = False
+        self.sala.save(update_fields=["permite_reserva_aluno"])
+        self.assertEqual(self.reservar().sala, self.sala)
+
+        self.outra_sala.ativa = False
+        self.outra_sala.save(update_fields=["ativa"])
+        with self.assertRaisesMessage(ValidationError, "Esta sala não está disponível"):
+            self.reservar(sala_id=self.outra_sala.pk)
+
     def test_impedir_conflito(self):
         self.reservar()
 
@@ -75,6 +91,23 @@ class ReservaServiceTests(TestCase):
             )
 
         self.assertEqual(Reserva.objects.count(), 1)
+        self.assertEqual(NotificacaoReserva.objects.count(), 1)
+
+    def test_falha_da_notificacao_desfaz_a_operacao_da_reserva(self):
+        with patch.object(NotificacaoReserva.objects, "create", side_effect=IntegrityError):
+            with self.assertRaises(IntegrityError):
+                self.reservar()
+
+        self.assertFalse(Reserva.objects.exists())
+        reserva = self.reservar()
+
+        with patch.object(NotificacaoReserva.objects, "create", side_effect=IntegrityError):
+            with self.assertRaises(IntegrityError):
+                cancelar_reserva(usuario=self.usuario, reserva_id=reserva.pk)
+
+        reserva.refresh_from_db()
+        self.assertEqual(reserva.status, Reserva.Status.CONFIRMADA)
+        self.assertEqual(reserva.notificacoes.count(), 1)
 
     def test_permitir_horario_seguinte(self):
         self.reservar()
@@ -151,6 +184,7 @@ class CriarReservaHTTPTests(TestCase):
             tipo="Laboratório",
             localizacao="Bloco A",
             capacidade=20,
+            permite_reserva_aluno=True,
         )
 
     def setUp(self):
@@ -180,17 +214,33 @@ class CriarReservaHTTPTests(TestCase):
         resposta = self.enviar()
 
         self.assertEqual(resposta.status_code, 201)
+        self.assertEqual(resposta.json()["notificacoes_nao_lidas"], 1)
         self.assertEqual(Reserva.objects.count(), 1)
 
         reserva = Reserva.objects.get()
         self.assertEqual(reserva.usuario, self.usuario)
+        notificacao = reserva.notificacoes.get()
+        self.assertEqual(notificacao.tipo, Reserva.Status.CONFIRMADA)
+        self.assertFalse(notificacao.lida)
 
     def test_conflito_http(self):
         self.enviar()
         resposta = self.enviar()
 
         self.assertEqual(resposta.status_code, 400)
+        self.assertEqual(resposta.json()["campo"], "inicio")
         self.assertEqual(Reserva.objects.count(), 1)
+
+    def test_aluno_nao_contorna_restricao_da_sala_pelo_post(self):
+        self.sala.permite_reserva_aluno = False
+        self.sala.save(update_fields=["permite_reserva_aluno"])
+
+        resposta = self.enviar({**self.dados, "perfil": "professor"})
+
+        self.assertEqual(resposta.status_code, 400)
+        self.assertIn("exclusiva para professores", resposta.json()["erro"])
+        self.assertFalse(Reserva.objects.exists())
+        self.assertFalse(NotificacaoReserva.objects.exists())
 
     def test_exigir_autenticacao(self):
         self.client.logout()
@@ -342,6 +392,9 @@ class CancelarReservaHTTPTests(TestCase):
         )
 
         self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(resposta.json()["status"], Reserva.Status.CANCELADA)
+        self.assertEqual(resposta.json()["status_label"], Reserva.Status.CANCELADA.label)
+        self.assertEqual(resposta.json()["notificacoes_nao_lidas"], 1)
 
         reserva.refresh_from_db()
         self.assertEqual(reserva.status, Reserva.Status.CANCELADA)
@@ -389,3 +442,4 @@ class CancelarReservaHTTPTests(TestCase):
 
         self.assertEqual(primeira_resposta.status_code, 200)
         self.assertEqual(segunda_resposta.status_code, 400)
+        self.assertEqual(reserva.notificacoes.get().tipo, Reserva.Status.CANCELADA)

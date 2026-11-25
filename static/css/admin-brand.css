@@ -1,0 +1,51 @@
+:root,
+html[data-theme] {
+    --primary: #585044;
+    --secondary: var(--salafacil-dark);
+    --accent: #ffad91;
+    --header-color: #f5ece3;
+    --header-branding-color: #fffdfb;
+    --header-bg: var(--salafacil-dark);
+    --breadcrumbs-fg: #f5ece3;
+    --breadcrumbs-bg: #484035;
+    --breadcrumbs-link-fg: #fffdfb;
+    --button-bg: #5f5146;
+    --button-hover-bg: #4c4138;
+    --default-button-bg: var(--salafacil-dark);
+    --default-button-hover-bg: var(--salafacil-dark-hover);
+    --font-family-primary: var(--salafacil-font);
+}
+
+html[data-theme="light"] {
+    --body-fg: var(--salafacil-dark);
+    --body-bg: var(--salafacil-surface);
+    --body-quiet-color: var(--salafacil-muted);
+    --darkened-bg: var(--salafacil-canvas);
+    --hairline-color: var(--salafacil-border);
+    --link-fg: var(--salafacil-link);
+    --link-hover-color: #732b14;
+    --link-selected-fg: var(--salafacil-link);
+}
+
+html[data-theme="dark"] {
+    --link-fg: #ffad91;
+    --link-hover-color: #ffcab8;
+    --link-selected-fg: #ffad91;
+}
+
+#site-name a {
+    font-weight: 750;
+    letter-spacing: -.025em;
+}
+
+#site-name a span {
+    color: var(--accent);
+}
+
+#site-name a small {
+    margin-inline-start: .5rem;
+    color: var(--header-color);
+    font-size: .75rem;
+    font-weight: 550;
+    letter-spacing: normal;
+}

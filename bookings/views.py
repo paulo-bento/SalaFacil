@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
-from .services import cancelar_reserva, criar_reserva
+from .services import cancelar_reserva, criar_reserva, estado_notificacoes
 
 
 @require_POST
@@ -84,8 +84,11 @@ def criar_reserva_view(request):
         )
 
     except ValidationError as erro:
+        resposta = {"erro": " ".join(erro.messages)}
+        if getattr(erro, "code", None):
+            resposta["campo"] = erro.code
         return JsonResponse(
-            {"erro": " ".join(erro.messages)},
+            resposta,
             status=400,
         )
 
@@ -93,6 +96,7 @@ def criar_reserva_view(request):
         {
             "mensagem": "Reserva confirmada com sucesso.",
             "reserva_id": reserva.pk,
+            **estado_notificacoes(request.user),
         },
         status=201,
     )
@@ -121,6 +125,9 @@ def cancelar_reserva_view(request, reserva_id):
         {
             "mensagem": "Reserva cancelada com sucesso.",
             "reserva_id": reserva.pk,
+            "status": reserva.status,
+            "status_label": reserva.get_status_display(),
+            **estado_notificacoes(request.user),
         },
         status=200,
     )

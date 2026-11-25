@@ -1,0 +1,5 @@
+<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <path d="M6 9a6 6 0 0 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9m4 12h4"/>
+</svg>
+{% if mostrar_rotulo %}<span>Notificações</span>{% endif %}
+<span class="notificacoes-contador" data-contador-notificacoes aria-hidden="true"{% if not avisos_notificacoes_ativos or not notificacoes_nao_lidas %} hidden{% endif %}>{% if avisos_notificacoes_ativos %}{% if notificacoes_nao_lidas > 99 %}99+{% else %}{{ notificacoes_nao_lidas }}{% endif %}{% endif %}</span>

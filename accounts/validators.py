@@ -3,9 +3,9 @@ from django.core.exceptions import ValidationError
 
 
 ALLOWED_EMAIL_DOMAINS = {
-    "unifip.edu.br",
-    "ads.fiponline.edu.br",
-    "gmail.com",
+    "unifip.edu.br", # E-mail da UNIFIP
+    "ads.fiponline.edu.br", # E-mail do curso de ADS da UNIFIP
+    "gmail.com", # Apenas para testes
 }
 
 

@@ -1,0 +1,14 @@
+<div id="avisos-sistema" class="avisos-sistema" aria-label="Avisos do sistema">
+    {% for message in messages %}
+        <p class="aviso-sistema" data-aviso-inicial="{{ message.level_tag }}">{{ message }}</p>
+    {% endfor %}
+    {% if form.errors or dados_pessoais.errors or preferencias_agenda.errors %}
+        <p class="aviso-sistema" data-aviso-inicial="error">Confira os campos destacados e tente novamente.</p>
+    {% endif %}
+    <div class="aviso-sistema" data-aviso-ativo hidden>
+        <p data-aviso-texto></p>
+        <button type="button" class="aviso-fechar" aria-label="Fechar aviso" data-aviso-fechar>×</button>
+    </div>
+    <span class="aviso-leitor" role="status" aria-atomic="true" data-aviso-status></span>
+    <span class="aviso-leitor" role="alert" aria-atomic="true" data-aviso-alerta></span>
+</div>

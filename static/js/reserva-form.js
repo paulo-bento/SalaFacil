@@ -1,9 +1,17 @@
 const formulario = document.querySelector("#reserva-form");
-const mensagem = document.querySelector("#reserva-feedback");
-const consultar = document.querySelector("#reserva-consultar");
 const botao = document.querySelector("#reserva-submit");
+let campoReservaInvalido;
+
+function limparErroCampoReserva() {
+    if (!campoReservaInvalido) return;
+    formulario.querySelector("#reserva-erro-campo")?.remove();
+    campoReservaInvalido.removeAttribute("aria-invalid");
+    campoReservaInvalido.removeAttribute("aria-describedby");
+    campoReservaInvalido = null;
+}
 
 if (formulario) {
+    formulario.addEventListener("input", limparErroCampoReserva);
     formulario.addEventListener("submit", async (event) => {
         event.preventDefault();
 
@@ -17,8 +25,7 @@ if (formulario) {
             finalidade: campos.finalidade.value.trim(),
         };
 
-        mensagem.hidden = true;
-        consultar.hidden = true;
+        limparErroCampoReserva();
         botao.disabled = true;
 
         try {
@@ -34,28 +41,41 @@ if (formulario) {
 
             const resultado = await resposta.json();
 
-            mensagem.textContent = resposta.ok
-                ? resultado.mensagem
-                : resultado.erro || "Não foi possível criar a reserva.";
-
-            mensagem.dataset.status = resposta.ok
-                ? "success"
-                : "error";
-
-            mensagem.hidden = false;
-
-            if (resposta.ok) {
-                consultar.href =
-                    `/?data=${encodeURIComponent(dados.data)}`;
-
-                consultar.hidden = false;
+            if (!resposta.ok) {
+                const mensagem = resultado.erro || "Não foi possível criar a reserva.";
+                if (resultado.campo) {
+                    campoReservaInvalido = campos.namedItem(resultado.campo);
+                }
+                if (campoReservaInvalido) {
+                    const descricao = document.createElement("span");
+                    descricao.id = "reserva-erro-campo";
+                    descricao.className = "reserva-erro-campo";
+                    descricao.textContent = mensagem;
+                    campoReservaInvalido.after(descricao);
+                    campoReservaInvalido.setAttribute("aria-invalid", "true");
+                    campoReservaInvalido.setAttribute("aria-describedby", descricao.id);
+                }
+                avisosSistema.mostrar(mensagem, "error");
+                return;
             }
-        } catch (erro) {
-            mensagem.textContent =
-                "Não foi possível comunicar com o servidor.";
 
-            mensagem.dataset.status = "error";
-            mensagem.hidden = false;
+            registrarMudancaNotificacoes(resultado);
+            const url = new URL(window.location.href);
+            url.searchParams.set("data", dados.data);
+            try {
+                await atualizarAgenda(url, { ancora: formulario, historico: "replaceState" });
+            } catch (erro) {
+                if (erro.name !== "AbortError") {
+                    avisosSistema.mostrar(
+                        "Reserva confirmada. Para atualizar a agenda, selecione a data da reserva e clique em Consultar.",
+                        "warning",
+                    );
+                    return;
+                }
+            }
+            avisosSistema.mostrar(resultado.mensagem, "success");
+        } catch {
+            avisosSistema.mostrar("Não foi possível comunicar com o servidor.", "error");
         } finally {
             botao.disabled = false;
         }

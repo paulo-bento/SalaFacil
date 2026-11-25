@@ -37,7 +37,7 @@
     min-width: 0;
     margin: 0;
     padding: 2rem;
-    background: linear-gradient(135deg, #2d2b25, #353228);
+    background: var(--salafacil-dark);
 }
 
 .brand-content {
@@ -80,6 +80,10 @@
 .form-content {
     width: 100%;
     max-width: 420px;
+}
+
+.login-form-panel .form-content > form {
+    margin-bottom: 0;
 }
 
 .login-header {
@@ -133,6 +137,7 @@
     width: 100%;
     height: 56px;
     margin-top: 0.5rem;
+    margin-bottom: 0;
     border: none;
     border-radius: 999px;
     background: #353228;
@@ -154,7 +159,7 @@
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    margin: 2rem 0 1.75rem;
+    margin: 1.5rem 0;
     color: #fff4ee;
     font-style: italic;
 }
@@ -251,10 +256,6 @@
     }
 }
 
-
-/* Recuperação de senha */
-
-
 /* Recuperação de senha */
 
 .login-form-panel .password-reset-link {
@@ -263,8 +264,8 @@
     margin: 8px auto 20px;
 
     color: #ffffff;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
     line-height: 1.4;
     text-align: center;
     text-decoration: none;

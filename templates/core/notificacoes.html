@@ -1,0 +1,45 @@
+<section class="card notificacoes-card" aria-labelledby="titulo-pagina">
+    {% if notificacoes %}
+        <div class="notificacoes-acoes">
+            <form action="{% url 'ler_todas_notificacoes' %}" method="post" id="notificacoes-ler-todas">
+                {% csrf_token %}
+                <button type="submit" class="btn"{% if not notificacoes_nao_lidas %} disabled{% endif %}>
+                    Marcar todas como lidas
+                </button>
+            </form>
+        </div>
+        <ol class="notificacoes-lista" id="notificacoes-lista">
+            {% for notificacao in notificacoes %}
+                <li class="notificacao{% if not notificacao.lida %} notificacao-nova{% endif %}">
+                    <div class="notificacao-conteudo">
+                        <div class="notificacao-cabecalho">
+                            <h2>{% if notificacao.tipo == 'confirmada' %}Reserva confirmada{% else %}Reserva cancelada{% endif %}</h2>
+                            <span class="notificacao-leitura" role="status">{% if notificacao.lida %}Lida{% else %}Não lida{% endif %}</span>
+                        </div>
+                        <p class="notificacao-reserva">
+                            <strong>{{ notificacao.reserva.sala.nome }}</strong>
+                            <span>{{ notificacao.reserva.data|date:"d/m/Y" }},
+                                  {{ notificacao.reserva.inicio|time:"H:i" }} às {{ notificacao.reserva.fim|time:"H:i" }}</span>
+                        </p>
+                        <time datetime="{{ notificacao.criada_em|date:'c' }}" class="notificacao-data">
+                            Registrada em {{ notificacao.criada_em|date:"d/m/Y" }} às {{ notificacao.criada_em|time:"H:i" }}
+                        </time>
+                    </div>
+                    {% if not notificacao.lida %}
+                        <form action="{% url 'ler_notificacao' notificacao.pk %}" method="post" class="notificacao-form">
+                            {% csrf_token %}
+                            <button type="submit" class="btn">Marcar como lida</button>
+                        </form>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ol>
+
+        {% include "core/paginacao.html" with pagina=notificacoes rotulo="Páginas de notificações" only %}
+    {% else %}
+        <div class="reserva-lista-vazia">
+            <h2>Você ainda não tem notificações.</h2>
+            <p>Novas confirmações e cancelamentos das suas reservas aparecerão aqui.</p>
+        </div>
+    {% endif %}
+</section>

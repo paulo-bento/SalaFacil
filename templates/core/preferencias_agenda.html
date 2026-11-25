@@ -1,0 +1,23 @@
+<section class="card conta-card" id="preferencias-agenda" aria-labelledby="titulo-preferencias-agenda">
+    <h2 id="titulo-preferencias-agenda">Preferências da agenda</h2>
+    <form method="post" action="{% url 'configuracoes' %}#preferencias-agenda">
+        {% csrf_token %}
+        <input type="hidden" name="acao" value="preferencias_agenda">
+        {% with campo=preferencias_agenda.tipos_sala_preferidos %}
+            <fieldset class="preferencias-agenda-tipos" aria-describedby="preferencias-agenda-ajuda">
+                {{ campo.legend_tag }}
+                <p id="preferencias-agenda-ajuda">Escolha os tipos de sala exibidos ao abrir a agenda ou marque Todos.</p>
+                <label for="{{ preferencias_agenda.todos_tipos.id_for_label }}">
+                    {{ preferencias_agenda.todos_tipos }} Todos
+                </label>
+                {% if campo.field.choices %}
+                    {{ campo }}
+                {% else %}
+                    <p>Nenhum tipo de sala ativo no momento.</p>
+                {% endif %}
+                {% if campo.errors %}<div role="alert">{{ campo.errors }}</div>{% endif %}
+            </fieldset>
+        {% endwith %}
+        <button type="submit" class="btn primary">Salvar preferências</button>
+    </form>
+</section>
