@@ -2,11 +2,13 @@
 
 O SalaFácil! é um sistema para consultar a disponibilidade e reservar salas e auditórios do seu campus.
 
-<img width="1920" height="1080" alt="SalaFácil!" src="https://github.com/user-attachments/assets/8d7a2a16-e183-4eed-99c9-e914140dbb24" />
-
 - **Agenda e reservas** — consulta de horários ocupados, filtros e bloqueio de reservas sobrepostas.
 - **Perfis acadêmicos** — alunos reservam ambientes liberados para seu perfil. Professores podem reservar salas ativas.
 - **Notificações e preferências** — histórico de confirmações e cancelamentos, controle de avisos e seleção dos tipos de sala exibidos por padrão.
+
+<p align="center">
+  <img width="840" alt="Tela do SalaFácil!" src="https://github.com/user-attachments/assets/8d7a2a16-e183-4eed-99c9-e914140dbb24" />
+</p>
 
 O projeto usa Python, Django, PostgreSQL, Django Templates, CSS e JavaScript.
 
