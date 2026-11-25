@@ -4,9 +4,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
+from django.contrib import messages
 from django.urls import reverse
 from django.views.decorators.http import require_POST
-from .forms import RegistrationForm
+from .forms import ProfileForm, RegistrationForm
 from .models import User
 
 
@@ -76,3 +77,17 @@ def register_view(request):
         form = RegistrationForm()
 
     return render(request, "accounts/register.html", {"form": form})
+
+
+@login_required(login_url="login")
+def profile_view(request):
+    if request.method == "POST":
+        form = ProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Seus dados foram atualizados com sucesso.")
+            return redirect("profile")
+    else:
+        form = ProfileForm(instance=request.user)
+
+    return render(request, "accounts/profile.html", {"form": form})

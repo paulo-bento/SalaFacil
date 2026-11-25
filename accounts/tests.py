@@ -171,6 +171,50 @@ class AcessoTests(TestCase):
         self.assertEqual(view(req).status_code, 200)
 
 
+class PerfilTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user("aluno@unifip.edu.br", SENHA)
+
+    def test_perfil_exige_login(self):
+        response = self.client.get(reverse("profile"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("login"), response["Location"])
+
+    def test_usuario_visualiza_perfil(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("profile"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Informações pessoais")
+        self.assertContains(response, "E-mail institucional")
+
+    def test_usuario_atualiza_dados_basicos(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse("profile"), {
+            "first_name": "João",
+            "last_name": "Silva",
+            "email": "JOAO@UNIFIP.EDU.BR",
+        })
+        self.assertRedirects(response, reverse("profile"))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.first_name, "João")
+        self.assertEqual(self.user.last_name, "Silva")
+        self.assertEqual(self.user.email, "joao@unifip.edu.br")
+
+    def test_nao_permite_email_de_outra_conta(self):
+        User.objects.create_user("outra@unifip.edu.br", SENHA)
+        self.client.force_login(self.user)
+        response = self.client.post(reverse("profile"), {
+            "first_name": "Aluno",
+            "last_name": "Teste",
+            "email": "outra@unifip.edu.br",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "já está sendo utilizado")
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.email, "aluno@unifip.edu.br")
+
+
 class RecuperacaoSenhaTests(TestCase):
     @classmethod
     def setUpTestData(cls):

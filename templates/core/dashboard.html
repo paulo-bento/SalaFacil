@@ -43,6 +43,15 @@
 
             <span>Agenda de salas</span>
         </a>
+
+        <a href="{% url 'profile' %}" class="nav-item">
+            <svg class="icon" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M5 21v-2a7 7 0 0 1 14 0v2"/>
+            </svg>
+            <span>Meu perfil</span>
+        </a>
     </nav>
 
 
@@ -67,7 +76,7 @@
         </div>
 
         <div class="topbar-right">
-            <div class="user-info">
+            <a class="user-info" href="{% url 'profile' %}" aria-label="Abrir meu perfil">
                 <div class="avatar">
                     {{ user.email|slice:":1"|upper }}
                 </div>
@@ -81,7 +90,7 @@
                         {% endif %}
                     </small>
                 </div>
-            </div>
+            </a>
 
             <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
