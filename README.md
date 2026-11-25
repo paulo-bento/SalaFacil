@@ -1,5 +1,7 @@
 # SalaFácil!
 
+<img width="1920" height="1080" alt="SalaFácil!" src="https://github.com/user-attachments/assets/8d7a2a16-e183-4eed-99c9-e914140dbb24" />
+
 O SalaFácil! é um sistema para consultar a disponibilidade e reservar salas e auditórios do seu campus.
 
 - **Agenda e reservas** — consulta de horários ocupados, filtros e bloqueio de reservas sobrepostas.
