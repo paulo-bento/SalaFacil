@@ -1,6 +1,6 @@
 # SalaFácil!
 
-O SalaFácil! é um sistema acadêmico para consultar a disponibilidade e reservar salas e auditórios da UNIFIP, Campus Patos. Alunos e professores podem filtrar a agenda por data e tipo de sala, gerenciar suas reservas e acompanhar confirmações e cancelamentos.
+O SalaFácil! é um sistema para consultar a disponibilidade e reservar salas e auditórios do seu campus.
 
 - **Agenda e reservas** — consulta de horários ocupados, filtros e bloqueio de reservas sobrepostas.
 - **Perfis acadêmicos** — alunos reservam ambientes liberados para seu perfil. Professores podem reservar salas ativas.
